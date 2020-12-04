@@ -1,54 +1,36 @@
+import string
 lines_list = open("input.txt").read().splitlines()
 
-required_keys = [
-"byr",
-"iyr",
-"eyr",
-"hgt",
-"hcl",
-"ecl",
-"pid",
-]
+def CheckStringInLimit(string_to_check, min_lim, max_lim):
+    return min_lim <= int(string_to_check) <= max_lim
+
+def CheckHeight(string_to_check):
+    if string_to_check[-2:] == "cm":
+        return CheckStringInLimit(string_to_check[:-2], 150, 193)
+    elif string_to_check[-2:] == "in":
+        return CheckStringInLimit(string_to_check[:-2], 59, 76)
+    else:
+        return False
+
+required_keys_with_check = {
+"byr" : lambda x : CheckStringInLimit(x, 1920, 2002),
+"iyr" : lambda x : CheckStringInLimit(x, 2010, 2020),
+"eyr" : lambda x : CheckStringInLimit(x, 2020, 2030),
+"hgt" : CheckHeight,
+"hcl" : lambda x: x[0] == "#" and all(c in string.hexdigits for c in x[1:]),
+"ecl" : lambda x: x in ["amb", "blu", "brn", "gry", "grn", "hzl", "oth"],
+"pid" : lambda x: len(x) == 9 and x.isdigit()
+}
+
 def is_key_valid(required_key, aux_dict):
     if not required_key in aux_dict.keys():
         return False
-    if required_key == "byr":
-        if int(aux_dict[required_key]) < 1920 or int(aux_dict[required_key]) > 2002:
-            return False
-    if required_key == "iyr":
-        if int(aux_dict[required_key]) < 2010 or int(aux_dict[required_key]) > 2020:
-            return False
-    if required_key == "eyr":
-        if int(aux_dict[required_key]) < 2020 or int(aux_dict[required_key]) > 2030:
-            return False
-    if required_key == "hgt":
-        string_to_check = aux_dict[required_key]
-        if string_to_check[-2:] == "cm":
-            if int(string_to_check[:-2]) < 150 or int(string_to_check[:-2]) > 193:
-                return False
-        elif string_to_check[-2:] == "in":
-            if int(string_to_check[:-2]) < 59 or int(string_to_check[:-2]) > 76:
-                return False
-        else:
-            return False
-    if required_key == "hcl":
-        string_to_check = aux_dict[required_key]
-        if not string_to_check[0] == "#":
-            return False
-        import string
-        if not all(c in string.hexdigits for c in string_to_check[1:]):
-            return False
-    if required_key == "ecl":
-        valid_eyes = ["amb", "blu", "brn", "gry", "grn", "hzl", "oth"]
-        if not aux_dict[required_key] in valid_eyes:
-            return False
-    if required_key == "pid":
-        if not len(aux_dict[required_key]) == 9 or not aux_dict[required_key].isdigit():
-            return False
+    if not required_keys_with_check[required_key](aux_dict[required_key]):
+        return False
     return True
 
 def is_passport_valid(aux_dict):
-    for required_key in required_keys:
+    for required_key in required_keys_with_check.keys():
         if not is_key_valid(required_key, aux_dict):
             return False
     return True
