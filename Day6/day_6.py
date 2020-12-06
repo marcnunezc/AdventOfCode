@@ -1,30 +1,14 @@
-lines_list = open("input.txt").read().splitlines()
+lines_list = open("input.txt").read().split("\n\n")
 
-aux_dict = {}
-counts = 0
-for line in lines_list:
-    if line == "":
-        counts += len(aux_dict.keys())
-        aux_dict = {}
-    else:
-        for char in line:
-            aux_dict[char] = 1
-counts += len(aux_dict.keys())
-print("Part 1 number of counts", counts)
+counts = sum([len({char for char in questionary if char != "\n"}) for questionary in lines_list])
+print("Part 1 number of counts 6565", counts)
 
 counts = 0
-aux_dict = {}
-is_first_line = True
-for line in lines_list:
-    if line == "":
-        counts += len(aux_dict.keys())
-        is_first_line = True
-    else:
-        if is_first_line:
-            aux_dict = {char:1 for char in line}
-        else:
-            if not len(aux_dict) == 0:
-                aux_dict = {char: 1 for char in line if char in aux_dict.keys()}
-        is_first_line = False
-counts += len(aux_dict.keys())
-print("Part 2 number of counts", counts)
+for questionary in lines_list:
+    aux_set = {char for char in questionary.split("\n")[0]}
+    for line in questionary.split("\n")[1:]:
+        if line != "":
+            aux_set=aux_set.intersection({char for char in line})
+    counts += len(aux_set)
+    is_first_line = True
+print("Part 2 number of counts 3137", counts)
