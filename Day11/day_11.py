@@ -6,6 +6,7 @@ j_length = len(lines_list[0])
 check_occup = lambda  i,j, lines: lines[i][j] == "#"
 check_found = lambda  i,j, lines: lines[i][j] == "L" or lines[i][j] =="#"
 check_range = lambda  i,j, lines: i in range(0, len(lines)) and j in range(0, len(lines[0]))
+
 def check_if_surrounded(i, j, lines):
     is_surrounded_list = [check_occup(i+delta_i, j+delta_j, lines) for delta_i in [-1,0,1] for delta_j in [-1,0,1] if not abs(delta_i)+abs(delta_j)==0 and check_range(i+delta_i,j+delta_j, lines)]
     return is_surrounded_list
@@ -16,16 +17,10 @@ def check_if_surrounded_2(i, j, lines):
             if check_found(i_aux, j_aux, lines):
                 return check_occup(i_aux, j_aux, lines)
         return False
-        
-    list_of_ranges=[[range(i-1,-1,-1), [j]*j_length],
-                    [range(i-1,-1,-1), range(j-1,-1,-1)],
-                    [range(i-1,-1,-1), range(j+1,j_length)],
-                    [[i]*i_length, range(j-1,-1,-1)],
-                    [[i]*i_length, range(j+1,j_length)],
-                    [range(i+1,i_length), [j]*j_length],
-                    [range(i+1,i_length), range(j-1,-1,-1)],
-                    [range(i+1,i_length), range(j+1,j_length)]]
-    is_surrounded_list = [get_ij_on_range_and_check(range_i, range_j) for range_i, range_j  in list_of_ranges]
+    i_ranges = [range(i-1,-1,-1), range(i+1,i_length), [i]*i_length]
+    j_ranges = [range(j-1,-1,-1), range(j+1,j_length), [j]*j_length]
+    list_of_ranges=[[i_range, j_range] for i_range in i_ranges for j_range in j_ranges]
+    is_surrounded_list = [get_ij_on_range_and_check(range_i, range_j) for range_i, range_j  in list_of_ranges[:-1]]
     return is_surrounded_list
 
 def count_seats(new_matrix):
