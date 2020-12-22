@@ -21,15 +21,12 @@ def check_sub_rule(rule, line):
             return False, line
     return True, line
 
-
 def check_rule(line, rule_key):
     for rule in rules[rule_key]:
-        line_to_check = line
-        number_of_trues = 0
-        rule_check, checked_line = check_sub_rule(rule, line_to_check)
+        rule_check, checked_line = check_sub_rule(rule, line)
         if rule_check:
             return True, checked_line
-    return False, line_to_check
+    return False, line
 
 def check_master(line, rule_key):
     is_check_rule, left_line = check_rule(line, rule_key)
