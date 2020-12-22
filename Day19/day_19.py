@@ -1,9 +1,9 @@
 
 def check_sub_sub_rule(line, subrule):
     if isinstance(rules[subrule], list):
-        is_check, line_checked =  check_rule(line, subrule)
+        is_check, checked_line =  check_rule(line, subrule)
         if is_check:
-            return True, line_checked
+            return True, checked_line
         else:
             return False, line
     else:
@@ -12,25 +12,21 @@ def check_sub_sub_rule(line, subrule):
         else:
             return False, line
 
-def check_sub_rule(rule, line_to_check):
-    sub_line_to_check = line_to_check
+def check_sub_rule(rule, line):
     for subrule in rule:
-        sub_rule_check, line_checked = check_sub_sub_rule(sub_line_to_check, subrule)
+        sub_rule_check, checked_line = check_sub_sub_rule(line, subrule)
         if sub_rule_check:
-            sub_line_to_check = line_checked
+            line = checked_line
         else:
-            return False, line_to_check
-    return True, sub_line_to_check
+            return False, line
+    return True, line
 
 
 def check_rule(line, rule_key):
-    rule_check = False
     for rule in rules[rule_key]:
-        sub_rule_check = True
         line_to_check = line
         number_of_trues = 0
-        sub_rule_check, checked_line = check_sub_rule(rule, line_to_check)
-        rule_check = max(sub_rule_check, rule_check)
+        rule_check, checked_line = check_sub_rule(rule, line_to_check)
         if rule_check:
             return True, checked_line
     return False, line_to_check
