@@ -1,5 +1,4 @@
-lines_list =open("test2.txt").read().splitlines()
-import copy
+lines_list =open("input.txt").read().splitlines()
 rules = {}
 i=0
 while lines_list[i] != "":
@@ -11,86 +10,53 @@ while lines_list[i] != "":
     i += 1
 i += 1
 
-def get_length(rule_key):
-    length = 0
-    for rule in rules[rule_key][0]:
-        if rule.isdigit():
-            length += get_length(rule)
-        else:
-            return 1
-    return length
-
-def check_sub_rule(line, subrule):
+def check_sub_sub_rule(line, subrule):
     if isinstance(rules[subrule], list):
-        return check_rule(line, subrule)
+        is_check, line_checked =  check_rule(line, subrule)
+        if is_check:
+            return True, line_checked
+        else:
+            return False, line
     else:
-        return line==rules[subrule]
+        if len(line) > 0 and line[0]==rules[subrule]:
+            return True, line[1:]
+        else:
+            return False, line
+
+def check_sub_rule(rule, line_to_check):
+    sub_line_to_check = line_to_check
+    for subrule in rule:
+        sub_rule_check, line_checked = check_sub_sub_rule(sub_line_to_check, subrule)
+        if sub_rule_check:
+            sub_line_to_check = line_checked
+        else:
+            return False, line_to_check
+    return True, sub_line_to_check
+
 
 def check_rule(line, rule_key):
-    if not sum(get_length(rule) for rule in rules[rule_key][0]) == len(line):
-        return False
     rule_check = False
-    starting_length = 0
     for rule in rules[rule_key]:
-        starting_sub_length = starting_length
         sub_rule_check = True
-        for subrule in rule:
-            this_length = starting_sub_length + get_length(subrule)
-            this_check = check_sub_rule(line[starting_sub_length:this_length], subrule)
-            sub_rule_check = min(this_check, sub_rule_check)
-            starting_sub_length = this_length
+        line_to_check = line
+        number_of_trues = 0
+        sub_rule_check, checked_line = check_sub_rule(rule, line_to_check)
         rule_check = max(sub_rule_check, rule_check)
-    return rule_check
+        if rule_check:
+            return True, checked_line
+    return False, line_to_check
 
-part_1=len([check for check in (check_rule(line,"0") for line in lines_list[i:]) if check])
+def check_master(line, rule_key):
+    is_check_rule, left_line = check_rule(line, rule_key)
+    return min(is_check_rule, len(left_line) == 0)
+
+part_1=len([check for check in (check_master(line,"0") for line in lines_list[i:]) if check])
 print("Part 1:",  part_1)
 
 
-def check_sub_rule2(line, subrule):
-    if isinstance(rules[subrule], list):
-        return check_rule2(line, subrule)
-    else:
-        return line==rules[subrule]
-
-dict_history = {}
-def check_rule2(line, rule_key):
-    # if not sum(get_length(rule) for rule in rules[rule_key][0]) == len(line):
-        # return False
-    if line=="":
-        return False
-    stopnow = False
-    for rule in rules[rule_key]:
-        if rule_key in rule:
-            stopnow=True
-            copy_to_replace = copy.deepcopy(rules[rule_key])
-            rules[rule_key].pop()
-            for j in range(1, 2):
-                aux_list = []
-                for x in copy_to_replace[-1]:
-                    if x == rule_key:
-                        for y in copy_to_replace[1]:
-                            aux_list.append(y)
-                    else:
-                        aux_list.append(x)
-                copy_to_replace.append(aux_list)
-                rules[rule_key].append([x for x in aux_list if x != rule_key])
-
-    rule_check = False
-    starting_length = 0
-    for rule in rules[rule_key]:
-        # print("################## Rule", rule)
-        starting_sub_length = starting_length
-        sub_rule_check = True
-        for subrule in rule:
-            this_length = starting_sub_length + get_length(subrule)
-            this_check = check_sub_rule2(line[starting_sub_length:this_length], subrule)
-            print(line[starting_sub_length:this_length])
-            sub_rule_check = min(this_check, sub_rule_check)
-            starting_sub_length = this_length
-        rule_check = max(sub_rule_check, rule_check)
-    return rule_check
 
 rules["8"] = [['42'], ['42','8']]
 rules["11"] =  [['42','31'], ['42','11','31']]
-part_2=len([check for check in (check_rule2(line,"0") for line in lines_list[i:]) if check])
+rules["0"] = [['8' ,'11'], ['8', '0']]
+part_2=len([check for check in (check_master(line,'0') for line in lines_list[i:]) if check])
 print("Part 2:",  part_2)
