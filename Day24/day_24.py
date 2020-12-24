@@ -47,25 +47,23 @@ def get_neigh_coord_list(tiles_color, tile_coord):
     return [[ref_tile[0]+neighbour[0], ref_tile[1]+neighbour[1]] for neighbour in neighbouring_list]
 
 def check_tile(dict_to_edit, ref_dict, tile_coord):
+    if tile_coord in checked_tiles:
+        return dict_to_edit, []
     neigh_coord_list = get_neigh_coord_list(ref_dict, tile_coord)
     neigh_color_list = [ref_dict[tuple(coords)] for coords in neigh_coord_list]
     b_len = len([neigh for neigh in neigh_color_list if neigh=="B"])
-    if color == "B":
+    if ref_dict[tile_coord] == "B":
         if not b_len in [1,2]:
             dict_to_edit[tile_coord] = "W"
     else:
         if b_len == 2:
             dict_to_edit[tile_coord] = "B"
-    return dict_to_edit, neigh_coord_list
+    checked_tiles.add(tile_coord)
+    return dict_to_edit, [neigh_coord for neigh_coord in neigh_coord_list if not tuple(neigh_coord) in checked_tiles]
 
 # e, se, sw, w, nw, and ne
 lines_list = open("input.txt").read().splitlines()
 tiles_color = defaultdict(lambda: "W")
-N = 200
-for i in range(-N, N):
-    for j in range(-N,N):
-        coords = [i*0.5, j*0.5]
-        tiles_color[tuple(coords)] = "W"
 flip = {
     "W" : "B",
     "B" : "W"
@@ -75,17 +73,31 @@ for line in lines_list:
     tiles_color[flip_tile] = flip[tiles_color[flip_tile]]
 print("Part 1", count_black(tiles_color))
 
+def check_neighbours(this_tile_dict, aux_dict, neighbour_list):
+    new_neigh_list = []
+    for neigh_coord in neighbour_list:
+        this_tile_dict, neigh_coord_list = check_tile(this_tile_dict, aux_dict, tuple(neigh_coord))
+        new_neigh_list.extend(neigh_coord_list)
+    return this_tile_dict, new_neigh_list
 
 days = 100
+
 for day in range(days):
+    checked_tiles = set()
     this_tile_dict = copy.deepcopy(tiles_color)
     neighbour_list = []
     aux_dict = copy.deepcopy(tiles_color)
     for tile_coord, color in tiles_color.items():
         this_tile_dict, neigh_coord_list = check_tile(this_tile_dict, aux_dict, tile_coord)
-        if color == "B":
-            neighbour_list.extend([coord for coord in neigh_coord_list if not tuple(coord) in tiles_color.keys()])
+        neighbour_list.extend([coord for coord in neigh_coord_list if not tuple(coord) in checked_tiles])
+    all_white = False
+    while(not all_white):
+        this_tile_dict, neighbour_list = check_neighbours(this_tile_dict, aux_dict, neighbour_list)
+        all_white = True
+        for neigh in neighbour_list:
+            if tiles_color[tuple(neigh)] == "B":
+                all_white = False
+
     tiles_color = copy.deepcopy(this_tile_dict)
     print("Day", day+1, count_black(tiles_color))
-
 print("Part 2", count_black(tiles_color))
