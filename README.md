@@ -1,5 +1,5 @@
-# AoC2020
+# Advent of code 
 
 adventofcode.com 
 
-Solution written in Python
+My solution for 2020 and 2021 written in Python
