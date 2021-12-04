@@ -49,8 +49,7 @@ def set_matching_key(board, number):
     return board
 
 if __name__ == "__main__":
-    file_name="input.txt"
-    lines_list = open(file_name).read().splitlines()
+    lines_list = open("input.txt").read().splitlines()
     random_numbers = [int(number) for number in lines_list[0].split(",")]
     boards_lines = lines_list[2:]
     boards_list = generate_boards_list(boards_lines)
@@ -60,7 +59,7 @@ if __name__ == "__main__":
         winner = check_if_someone_won(boards_list)
         if winner is not None:
             break
-    print("Part 1", number*sum(value[0] for key, value in winner.items() if not value[1]))
+    print("Part 1", number*sum(value[0] for value in winner.values() if not value[1]))
 
     boards_list = generate_boards_list(boards_lines)
     for number in random_numbers:
@@ -74,4 +73,4 @@ if __name__ == "__main__":
             else:
                 break
     winner = winners[0]
-    print("Part 2", number*sum(value[0] for key, value in winner.items() if not value[1]))
+    print("Part 2", number*sum(value[0] for value in winner.values() if not value[1]))
