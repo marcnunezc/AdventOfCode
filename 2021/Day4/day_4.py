@@ -39,23 +39,24 @@ def check_all_winners(boards_list):
             if min(board[(i,j)][1] for i in range(5)) and board not in winners:
                 winners.append(board)
                 break
-    if len(winners)>0:
-        return winners
-    else:
-        return None
+    return winners
+
+def set_matching_key(board, number):
+    for key in board.keys():
+        if board[key][0] == number:
+            board[key][1] = True
+            return board
+    return board
 
 if __name__ == "__main__":
-
     file_name="input.txt"
-    random_numbers = [int(number) for number in open(file_name).read().splitlines()[0].split(",")]
-    boards_lines = open(file_name).read().splitlines()[2:]
+    lines_list = open(file_name).read().splitlines()
+    random_numbers = [int(number) for number in lines_list[0].split(",")]
+    boards_lines = lines_list[2:]
     boards_list = generate_boards_list(boards_lines)
     for number in random_numbers:
-        for i_board, board in enumerate(boards_list):
-            for key in board.keys():
-                if board[key][0] == number:
-                    board[key][1] = True
-                    break
+        for board in boards_list:
+            board = set_matching_key(board, number)
         winner = check_if_someone_won(boards_list)
         if winner is not None:
             break
@@ -63,13 +64,10 @@ if __name__ == "__main__":
 
     boards_list = generate_boards_list(boards_lines)
     for number in random_numbers:
-        for i_board, board in enumerate(boards_list):
-            for key in board.keys():
-                if board[key][0] == number:
-                    board[key][1] = True
-                    break
+        for board in boards_list:
+            board = set_matching_key(board, number)
         winners = check_all_winners(boards_list)
-        if winners is not None :
+        if len(winners) > 0:
             if len(boards_list) > 1:
                 for winner in winners:
                     boards_list.remove(winner)
