@@ -27,13 +27,10 @@ def simulate_days(days, fishes):
                 fish.decrease()
         if to_add > 0:
             fishes.add(GroupOfFishes(to_add))
+    return fishes
 
 if __name__ == '__main__':
 
     fishes = {LanternFish(int(value)) for value in open('input.txt').read().splitlines()[0].split(',')}
-    simulate_days(80, fishes)
-    print("Part 1", sum(len(fish) for fish in fishes))
-
-    fishes = {LanternFish(int(value)) for value in open('input.txt').read().splitlines()[0].split(',')}
-    simulate_days(256, fishes)
-    print("Part 2", sum(len(fish) for fish in fishes))
+    print("Part 1", sum(len(fish) for fish in simulate_days(80, fishes)))
+    print("Part 2", sum(len(fish) for fish in simulate_days(256, fishes)))
