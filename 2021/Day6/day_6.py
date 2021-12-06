@@ -30,7 +30,10 @@ def simulate_days(days, fishes):
     return fishes
 
 if __name__ == '__main__':
-
+    import time
+    ini_time = time.time()
     fishes = {LanternFish(int(value)) for value in open('input.txt').read().splitlines()[0].split(',')}
     print("Part 1", sum(len(fish) for fish in simulate_days(80, fishes)))
+    fishes = {LanternFish(int(value)) for value in open('input.txt').read().splitlines()[0].split(',')}
     print("Part 2", sum(len(fish) for fish in simulate_days(256, fishes)))
+    print("Time:", time.time() - ini_time)
