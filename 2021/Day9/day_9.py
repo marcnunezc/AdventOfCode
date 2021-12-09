@@ -20,12 +20,5 @@ def search_basin(current, i, j, basin_path):
         basin_path = search_basin(neighbor[0], neighbor[1], neighbor[2], basin_path)
     return basin_path
 
-
-basins=[]
-for low_point in low_points:
-    i,j = low_point
-    current = smoke_matrix[i][j]
-    basin_path = {(current, i,j)}
-    basin_path=search_basin(current, i, j, basin_path)
-    basins.append(len(basin_path))
+basins=[len(search_basin(smoke_matrix[i][j], i, j, {(smoke_matrix[i][j], i,j)})) for i,j in low_points]
 print("Part 2",np.prod([basin for basin in reversed(sorted(basins))][0:3]))
