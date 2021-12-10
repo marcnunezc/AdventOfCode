@@ -12,7 +12,7 @@ for line in lines_list:
         if char in openers:
             opener_list.append(char)
         elif char == closer_map[opener_list[-1]]:
-                opener_list.pop()
+            opener_list.pop()
         else:
             print("Expected {}, but found {} instead".format(closer_map[opener_list[-1]], char))
             failed_chars.append(char)
