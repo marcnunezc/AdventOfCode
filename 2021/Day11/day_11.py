@@ -30,14 +30,12 @@ def count_flashes(matrix):
 def advance_step(matrix):
     matrix = [[value+1 for value in line] for line in matrix]
     matrix = mark_to_flash(matrix)
-    new_flashed = count_marked(matrix)
-    total_flashes = new_flashed
-    while new_flashed>0:
+    marked_octopus = count_marked(matrix)
+    while marked_octopus>0:
         matrix = mark_to_flash(reset_flashed(increase_neighbours(matrix)))
-        new_flashed = count_marked(matrix)
-        total_flashes += new_flashed
+        marked_octopus = count_marked(matrix)
     matrix = reset_flashed(matrix)
-    return matrix, total_flashes
+    return matrix
 
 if __name__ == "__main__":
     filename = "input.txt"
@@ -46,14 +44,14 @@ if __name__ == "__main__":
 
     total_of_flashes = 0
     for step in range(steps):
-        octo_matrix, step_flashes = advance_step(octo_matrix)
-        total_of_flashes += step_flashes
+        octo_matrix = advance_step(octo_matrix)
+        total_of_flashes += count_flashes(octo_matrix)
     print("Part 1", total_of_flashes)
 
 
     octo_matrix = [[int(value) for value in line] for line in open(filename).read().splitlines()]
     step=0
     while not count_flashes(octo_matrix) == len(octo_matrix)*len(octo_matrix[0]):
-        octo_matrix, _ = advance_step(octo_matrix)
+        octo_matrix = advance_step(octo_matrix)
         step += 1
     print("Part 2", step)
