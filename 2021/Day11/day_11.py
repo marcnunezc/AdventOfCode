@@ -4,48 +4,38 @@ def pretty_print(matrix):
         print("".join([str(value) if value < 10 else '\033[95m'+str(value)+'\033[0m' for value in line]))
     print("")
 
-def find_flashed(matrix):
-    flashed = set()
-    for i in range(len(matrix)):
-        for j in range(len(matrix[i])):
-            if matrix[i][j] > 9:
-                flashed.add((i,j))
-                matrix[i][j] = -1
-    return flashed, matrix
+def mark_to_flash(matrix):
+    return [[-1 if matrix[i][j] > 9 else matrix[i][j] for j in range(len(matrix[i]))] for i in range(len(matrix))]
 
 def increase_neighbours(matrix):
     for i in range(len(matrix)):
         for j in range(len(matrix[i])):
-            for m,n in [(i-1,j),(i+1,j),(i,j-1),(i,j+1), (i-1,j-1),(i+1,j-1),(i-1,j+1),(i+1,j+1)]:
-                if 0 <= m < len(matrix) and 0 <= n < len(matrix[i]):
-                    if matrix[m][n] == -1 and  matrix[i][j] > 0:
+            if matrix[i][j] > 0:
+                all_neighbours = [(i-1,j),(i+1,j),(i,j-1),(i,j+1), (i-1,j-1),(i+1,j-1),(i-1,j+1),(i+1,j+1)]
+                neighbours = [(m,n) for m,n in all_neighbours if 0 <= m < len(matrix) and 0 <= n < len(matrix[i])]
+                for m,n in neighbours:
+                    if matrix[m][n] == -1:
                         matrix[i][j] += 1
     return matrix
 
+def count_marked(matrix):
+    return sum([sum([matrix[i][j] == -1 for j in range(len(matrix[i]))]) for i in range(len(matrix))])
+
 def reset_flashed(matrix):
-    for i in range(len(matrix)):
-        for j in range(len(matrix[i])):
-            if matrix[i][j] == -1:
-                matrix[i][j] = 0
-    return matrix
+    return [[0 if matrix[i][j] == -1 else matrix[i][j] for j in range(len(matrix[i]))] for i in range(len(matrix))]
 
 def count_flashes(matrix):
-    count = 0
-    for i in range(len(matrix)):
-        for j in range(len(matrix[i])):
-            if octo_matrix[i][j] == 0:
-                count +=1
-    return count
+    return sum([sum([matrix[i][j] == 0 for j in range(len(matrix[i]))]) for i in range(len(matrix))])
 
 def advance_step(matrix):
     matrix = [[value+1 for value in line] for line in matrix]
-    new_flashed, matrix = find_flashed(matrix)
-    total_flashes = len(new_flashed)
-    while len(new_flashed)>0:
-        matrix = increase_neighbours(matrix)
-        matrix = reset_flashed(matrix)
-        new_flashed, matrix = find_flashed(matrix)
-        total_flashes += len(new_flashed)
+    matrix = mark_to_flash(matrix)
+    new_flashed = count_marked(matrix)
+    total_flashes = new_flashed
+    while new_flashed>0:
+        matrix = mark_to_flash(reset_flashed(increase_neighbours(matrix)))
+        new_flashed = count_marked(matrix)
+        total_flashes += new_flashed
     matrix = reset_flashed(matrix)
     return matrix, total_flashes
 
