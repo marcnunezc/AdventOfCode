@@ -20,9 +20,7 @@ def next_path(list_of_paths, starting_path, key, caves, lower_case=None):
         return
     for cave in caves[key]:
         if not (cave.islower() and cave in starting_path) or (cave == lower_case and starting_path.count(cave) < 2):
-            new_path = starting_path.copy()
-            new_path.append(cave)
-            next_path(list_of_paths, new_path, cave, caves, lower_case)
+            next_path(list_of_paths, starting_path+[cave], cave, caves, lower_case)
 
 
 if __name__ == '__main__':
