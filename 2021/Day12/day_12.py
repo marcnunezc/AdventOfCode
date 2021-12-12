@@ -16,7 +16,7 @@ def read_input(filename):
 
 def next_path(list_of_paths, starting_path, key, caves, lower_case=None):
     if key == 'end':
-        list_of_paths.append(starting_path)
+        list_of_paths.append(tuple(starting_path))
         return
     for cave in caves[key]:
         new_path = starting_path.copy()
@@ -37,4 +37,4 @@ if __name__ == '__main__':
         for cave in caves["start"]:
             path = ["start", cave]
             next_path(list_of_paths, path, cave, caves, lower)
-    print("Part 2", len(list(dict.fromkeys([tuple(path) for path in list_of_paths]))))
+    print("Part 2", len(list(dict.fromkeys(list_of_paths))))
