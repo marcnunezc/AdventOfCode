@@ -26,8 +26,6 @@ def next_path(list_of_paths, starting_path, key, caves, lower_case=None):
 
 
 if __name__ == '__main__':
-    import time
-    ini_time = time.perf_counter()
     caves, lower_case = read_input("input.txt")
     list_of_paths =  []
     for cave in caves["start"]:
@@ -40,4 +38,3 @@ if __name__ == '__main__':
             path = ["start", cave]
             next_path(list_of_paths, path, cave, caves, lower)
     print("Part 2", len(list(dict.fromkeys(list_of_paths))))
-    print("Time:", time.perf_counter() - ini_time)
