@@ -19,13 +19,15 @@ def next_path(list_of_paths, starting_path, key, caves, lower_case=None):
         list_of_paths.append(tuple(starting_path))
         return
     for cave in caves[key]:
-        new_path = starting_path.copy()
-        if not (cave.islower() and cave in new_path) or (cave == lower_case and new_path.count(cave) < 2):
+        if not (cave.islower() and cave in starting_path) or (cave == lower_case and starting_path.count(cave) < 2):
+            new_path = starting_path.copy()
             new_path.append(cave)
             next_path(list_of_paths, new_path, cave, caves, lower_case)
 
 
 if __name__ == '__main__':
+    import time
+    ini_time = time.perf_counter()
     caves, lower_case = read_input("input.txt")
     list_of_paths =  []
     for cave in caves["start"]:
@@ -38,3 +40,4 @@ if __name__ == '__main__':
             path = ["start", cave]
             next_path(list_of_paths, path, cave, caves, lower)
     print("Part 2", len(list(dict.fromkeys(list_of_paths))))
+    print("Time:", time.perf_counter() - ini_time)
