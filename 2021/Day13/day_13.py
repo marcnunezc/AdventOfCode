@@ -19,35 +19,30 @@ def fold_paper(dots, instruction):
     max_y = max(dots, key=lambda x: x[1])[1]
     old_dots = dots.copy()
     dots = set()
-    n_dots = 0
     if "y" in instruction[0]:
         for y in range(0, max_y+1):
             if y < instruction[1]:
                 for x in range(0, max_x+1):
                     if (x,y) in old_dots or (x,max_y-y) in old_dots:
                         dots.add((x,y))
-                        n_dots += 1
     if "x" in instruction[0]:
         for y in range(0, max_y+1):
             for x in range(0, max_x+1):
                 if x < instruction[1]:
                     if (x,y) in old_dots or (max_x-x,y) in old_dots:
                         dots.add((x,y))
-                        n_dots += 1
-    return dots, n_dots
+    return dots
 
 if __name__ == "__main__":
     dots, instructions_list = read_input("input.txt")
 
-    print("Part 1:", fold_paper(dots, instructions_list[0])[1])
+    print("Part 1:", len(fold_paper(dots, instructions_list[0])))
 
     for instruction in instructions_list:
-        dots, _ = fold_paper(dots, instruction)
-    max_x = max(dots, key=lambda x: x[0])[0]
-    max_y = max(dots, key=lambda x: x[1])[1]
+        dots = fold_paper(dots, instruction)
     print("Part 2:")
-    for y in range(0, max_y+1):
-        for x in range(0, max_x+1):
+    for y in range(0, max(dots, key=lambda x: x[1])[1]+1):
+        for x in range(0, max(dots, key=lambda x: x[0])[0]+1):
             if (x,y) in dots:
                 print('#', end='')
             else:
