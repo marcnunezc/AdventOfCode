@@ -46,5 +46,5 @@ if __name__ == "__main__":
             if (x,y) in dots:
                 print('#', end='')
             else:
-                print('.', end='')
+                print(' ', end='')
         print()
