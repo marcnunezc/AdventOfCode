@@ -13,33 +13,6 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 1
-      matrix:
-        include:
-          - subject: Plain body (attachment)
-            attachments: action.yml
-            body: |
-              first line
-              second line
-          - subject: HTML body (attachments)
-            attachments: package.json,package-lock.json
-            html_body: |
-              <!DOCTYPE html>
-              <html>
-              <body>
-              <h1>Heading</h1>
-              <p>Paragraph</p>
-              </body>
-              </html>
-          - subject: Plain body (Markdown)
-            convert_markdown: true
-            body: file://README.md
-          - subject: HTML body (Markdown)
-            convert_markdown: true
-            html_body: file://README.md
-          - subject: Multipart body (Markdown)
-            convert_markdown: true
-            body: file://README.md
-            html_body: file://README.md
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -65,12 +38,9 @@ jobs:
           # Optional plain body:
           body: Build job of ${{github.repository}} completed successfully!
           # Optional HTML body read from file:
-          html_body: file://README.html
           # Optional unsigned/invalid certificates allowance:
           ignore_cert: true
           # Optional converting Markdown to HTML (set content_type to text/html too):
           convert_markdown: true
-          # Optional attachments:
-          attachments: attachments.zip,git.diff,./dist/static/*.js
           # Optional priority: 'high', 'normal' (default) or 'low'
           priority: low
