@@ -1,5 +1,13 @@
 import numpy as np
-
+process_values = {
+    0 : lambda x: sum(x),
+    1 : lambda x: np.prod(x),
+    2 : lambda x: min(x),
+    3 : lambda x: max(x),
+    5 : lambda x: 1 if x[0] > x[1] else 0,
+    6 : lambda x: 1 if x[0] < x[1] else 0,
+    7 : lambda x: 1 if x[0] == x[1] else 0
+}
 def evaluate_number(transmission, i, version_sum):
     version = transmission[i:i+3]
     version_sum += int(version, 2)
@@ -29,32 +37,7 @@ def evaluate_number(transmission, i, version_sum):
             for sub_pack in range(sub_pack_number):
                 number, i, version_sum = evaluate_number(transmission, i, version_sum)
                 values.append(number)
-        processed_value = process_value(pack_type, values)
-        return processed_value, i, version_sum
-
-def process_value(pack_type, values):
-    if int(pack_type,2) == 0:
-        return sum(values)
-    elif int(pack_type,2) == 1:
-        return np.prod(values)
-    elif int(pack_type,2) == 2:
-        return min(values)
-    elif int(pack_type,2) == 3:
-        return max(values)
-    elif int(pack_type,2) == 5:
-        if not len(values) == 2:
-            raise(Exception("Error: expected 2 values for pack type 5"))
-        return 1 if values[0] > values[1] else 0
-    elif int(pack_type,2) == 6:
-        if not len(values) == 2:
-            raise(Exception("Error: expected 2 values for pack type 6"))
-        return 1 if values[0] < values[1] else 0
-    elif int(pack_type,2) == 7:
-        if not len(values) == 2:
-            raise(Exception("Error: expected 2 values for pack type 7"))
-        return 1 if values[0] == values[1] else 0
-    else:
-        raise(Exception("Error: unknown pack type"))
+        return process_values[int(pack_type, 2)](values), i, version_sum
 
 if __name__ == "__main__":
     hexa_string = open("input.txt").read().strip()
