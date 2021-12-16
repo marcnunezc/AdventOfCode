@@ -1,12 +1,14 @@
+from collections import defaultdict
+
 def compute_score(max_i, max_j, evaluate_risk):
-    score = {(i,j):1e6 if not (i==0 and j == 0) else 0 for i in range(max_i) for j in range(max_j)}
+    score = defaultdict(lambda : 1e6)
+    score[(0,0)] = 0
     visited = set()
     visited_neighs = set()
     current_node = (0,0)
     while not current_node == (max_i-1, max_j-1):
         i, j = current_node
 
-        ini_time = time.time()
         neighbors = [(evaluate_risk(m,n), m, n) for m,n in [(i-1,j),(i+1,j),(i,j-1),(i,j+1)] \
                     if 0 <= m < max_i and 0 <= n < max_j  \
                         and not (m,n) in visited]
