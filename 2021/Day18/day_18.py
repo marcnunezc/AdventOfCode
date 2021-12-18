@@ -56,14 +56,7 @@ def do_explode(line):
     regex = re.findall("\d+", to_reduce)
     left_regex = re.findall("\d+", left)
     right_regex = re.findall("\d+", right)
-    if to_reduce[-1].isnumeric():
-        result = "0,"+str(int(regex[1])+int(regex[2]))
-        leftmost = get_leftmost_index(left)
-        if leftmost > 0:
-            subline = line[:i]
-            left = subline[:(leftmost+1-len(left_regex[-1]))] + str(int(regex[0].split(',')[0])+int(left_regex[-1])) + subline[leftmost+1:]
-        return left+result+right
-    elif to_reduce.count("[") == 1:
+    if to_reduce.count("[") == 1 and not to_reduce[-1].isnumeric():
         result = left[:-(len(left_regex[-1])+1)]+str(int(left_regex[-1])+int(regex[0]))+",0"+right
         rightmost = get_rightmost_index(right) + len(result) - len(right)
         if result[rightmost].isnumeric():
@@ -71,7 +64,10 @@ def do_explode(line):
         else:
             return result
     else:
-        result = "0,["+str(int(regex[1])+int(regex[2]))+","+regex[3]+"]"
+        if to_reduce[-1].isnumeric():
+            result = "0,"+str(int(regex[1])+int(regex[2]))
+        else:
+            result = "0,["+str(int(regex[1])+int(regex[2]))+","+regex[3]+"]"
         leftmost = get_leftmost_index(left)
         if leftmost > 0:
             subline = line[:i]
