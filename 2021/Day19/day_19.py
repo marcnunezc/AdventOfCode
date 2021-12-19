@@ -60,7 +60,10 @@ def search_down(i, connecitvity_map,communication=[], previous=0):
 def generate_communication_map(connecitvity_map):
     communication_map = {}
     for i in connecitvity_map.keys():
-        communication_map[i] = search_down(i,connectivity_map, [])
+        if 0 in connecitvity_map[i]:
+            communication_map[i] = [0]
+        else:
+            communication_map[i] = search_down(i,connectivity_map, [])
     return communication_map
 
 def compute_connectivity(i,j,rotated_beacons, scanner_j, beacon_j,connecitvity_map, translation_map, orientation_map):
