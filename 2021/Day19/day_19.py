@@ -19,8 +19,17 @@ def compute_orientations(position=[1,2,3]):
         for factor in [1,-1]:
             facing = [x*factor if this_i == i else x for this_i, x in enumerate(position)]
             aux_i = [j for j in range(len(position)) if j != i]
-            # for ra,rb in [(2,-1), (-2,-1), (-2,1), (-1,2)]:
-            for ra,rb in [(1,2), (2,-1), (-1,-2), (-2,1), (-2, -1), (1,-2),(-1,2),(2,1)]:
+            if factor == 1:
+                if i==1:
+                    rotations=[(2,1), (1,-2), (-2,-1), (1,-2)]
+                else:
+                    rotations=[(1,2), (2,-1), (-1,-2), (-2,1)]
+            else:
+                if i==1:
+                    rotations=[(1,2), (2,-1), (-1,-2), (-2,1)]
+                else:
+                    rotations=[(2,1), (1,-2), (-2,-1), (1,-2)]
+            for ra,rb in rotations:
                 rotation = [facing[i]]
                 sign_a = 1 if ra > 0 else -1
                 sign_b = 1 if rb > 0 else -1
