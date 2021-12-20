@@ -47,19 +47,19 @@ def advance(input_image, mode, step):
             new_image[len(new_image[0])-1][i]=replace
     return new_image
 
+def solve_problem(input_image, steps, mode):
+    for step in range(steps):
+        if (step+1) % 10 == 0:
+            print("Step", step+1)
+        input_image = advance(input_image, mode, step+1)
+    return sum([row.count('#') for row in input_image])
+
 if __name__ == "__main__":
+    import time
+    start_time = time.time()
     lines_list = open('input.txt').read().splitlines()
     enhancement = lines_list[0]
     input_image=[ [value for value in line] for line in lines_list[2:]]
-    mode = enhancement[0]
-    for step in range(2):
-        input_image = advance(input_image, mode, step+1)
-    print("Part 1", sum(sum(1 for c in row if c=='#') for row in input_image))
-
-    input_image=[ [value for value in line] for line in lines_list[2:]]
-    mode = enhancement[0]
-    for step in range(50):
-        input_image = advance(input_image, mode, step+1)
-        if (step+1) % 10 == 0:
-            print("Step:",step+1)
-    print("Part 2", sum(sum(1 for c in row if c=='#') for row in input_image))
+    print("Part 1", solve_problem(input_image, 2, enhancement[0]))
+    print("Part 2", solve_problem(input_image, 50, enhancement[0]))
+    print("Time elapsed:", time.time() - start_time)
