@@ -68,6 +68,26 @@ def generate_communication_map(connecitvity_map):
             communication_map[i] = search_down(i,connectivity_map, [])
     return communication_map
 
+def compute_connectivity(i,j,scanner,scanner_j,connectivity_map,translation_map,orientation_map):
+    if i==0 or i == j:
+        return connectivity_map, translation_map, orientation_map
+
+    for orientation in orientations:
+        hashed_distances = Counter()
+        rotated_beacons = compute_rotations(orientation, scanner)
+        for beacon_i in rotated_beacons:
+            for beacon_j in scanner_j:
+                distance_x = beacon_j[0]-beacon_i[0]
+                distance_y = beacon_j[1]-beacon_i[1]
+                distance_z = beacon_j[2]-beacon_i[2]
+                hashed_distances[(distance_x, distance_y, distance_z)] += 1
+                if hashed_distances[(distance_x, distance_y, distance_z)] >=12:
+                    connectivity_map[i].add(j)
+                    translation_map[(i,j)] = [x for x in (distance_x, distance_y, distance_z)]
+                    orientation_map[(i,j)] = orientation
+                    return connectivity_map, translation_map, orientation_map
+    return connectivity_map, translation_map, orientation_map
+
 start_time = time.time()
 filename = "input.txt"
 lines_list = open(filename).read().splitlines()
@@ -76,30 +96,13 @@ scanners = read_input(lines_list)
 connectivity_map = {}
 translation_map = {}
 orientation_map = {}
-
 orientations = compute_orientations()
+
 for i,scanner in enumerate(scanners):
-    if i == 0:
-        continue
     connectivity_map[i] = set()
     print("Computing connecitvity for scanner {}".format(i))
     for j,scanner_j in enumerate(scanners):
-        if i == j:
-            continue
-        for orientation in orientations:
-            hashed_distances = Counter()
-            rotated_beacons = compute_rotations(orientation, scanner)
-            for beacon_i in rotated_beacons:
-                for beacon_j in scanner_j:
-                    distance_x = beacon_j[0]-beacon_i[0]
-                    distance_y = beacon_j[1]-beacon_i[1]
-                    distance_z = beacon_j[2]-beacon_i[2]
-                    hashed_distances[(distance_x, distance_y, distance_z)] += 1
-            for distance, count in hashed_distances.items():
-                if count >= 12:
-                    connectivity_map[i].add(j)
-                    translation_map[(i,j)] = [x for x in distance]
-                    orientation_map[(i,j)] = orientation
+        connectivity_map, translation_map, orientation_map = compute_connectivity(i,j,scanner,scanner_j,connectivity_map,translation_map,orientation_map)
 
 communication_map = generate_communication_map(connectivity_map)
 all_beacons = {(beacon[0],beacon[1],beacon[2]) for beacon in scanners[0]}
