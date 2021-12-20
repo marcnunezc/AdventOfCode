@@ -106,6 +106,7 @@ for i,scanner in enumerate(scanners):
 
 communication_map = generate_communication_map(connectivity_map)
 all_beacons = {(beacon[0],beacon[1],beacon[2]) for beacon in scanners[0]}
+coords = [[0,0,0]]
 for i_scan, scanner in enumerate(scanners[1:]):
     for beacon in scanner:
         current_connection=i_scan+1
@@ -116,13 +117,8 @@ for i_scan, scanner in enumerate(scanners[1:]):
             beacon=[x+y for x,y in zip(rotated_beacon, translation)]
             current_connection = next_connection
         all_beacons.add((beacon[0],beacon[1],beacon[2]))
-all_beacons = sorted(all_beacons, key=lambda x: x[0])
-print("Part 1",len(all_beacons))
-
-coords = [[0,0,0]]
-for i_scan, scanner in enumerate(scanners[1:]):
-    current_connection=i_scan+1
     distance = [0,0,0]
+    current_connection=i_scan+1
     for next_connection in communication_map[i_scan+1]:
         translation = translation_map[(current_connection,next_connection)]
         orientation = orientation_map[(current_connection,next_connection)]
@@ -130,6 +126,9 @@ for i_scan, scanner in enumerate(scanners[1:]):
         distance = [x+y for x,y in zip(distance, translation)]
         current_connection = next_connection
     coords.append(distance)
+
+print("Part 1",len(all_beacons))
+
 max_distance = -1e6
 for i in range(len(coords)):
     for j in range(len(coords)):
