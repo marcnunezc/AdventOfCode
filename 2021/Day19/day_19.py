@@ -1,5 +1,6 @@
 import time
 import pickle
+from collections import Counter
 
 def read_input(lines_list):
     scanners = []
@@ -38,14 +39,6 @@ def compute_orientations(position=[1,2,3]):
                 orientations.append(rotation)
     return orientations
 
-def compute_translation(scanner_0, value0, scanner_1):
-    for value1 in scanner_1:
-        translation = [ x-y for x,y in zip(value0, value1)]
-        all_translated_1 =  [[x+y for x,y in zip(line, translation)] for line in scanner_1]
-        if sum([beacon in scanner_0 for beacon in all_translated_1])>=12:
-            return translation
-    return None
-
 def compute_rotations(orientation, scanner):
     return [[beacon[abs(i)-1]*fact for i, fact in zip(orientation, [1 if x>0 else -1 for x in orientation])] for beacon in scanner]
 
@@ -74,17 +67,6 @@ def generate_communication_map(connecitvity_map):
         else:
             communication_map[i] = search_down(i,connectivity_map, [])
     return communication_map
-
-def compute_connectivity(i,j,rotated_beacons, scanner_j, beacon_j,connecitvity_map, translation_map, orientation_map):
-    for value1 in rotated_beacons:
-        translation = [x-y for x,y in zip(beacon_j, value1)]
-        all_translated_1 =  [[x+y for x,y in zip(line, translation)] for line in rotated_beacons]
-        if sum([beacon in scanner_j for beacon in all_translated_1])>=12:
-            connectivity_map[i].add(j)
-            translation_map[(i,j)] = translation
-            orientation_map[(i,j)] = orientation
-            return connectivity_map, translation_map, orientation_map, True
-    return connectivity_map, translation_map, orientation_map, False
 
 start_time = time.time()
 filename = "input.txt"
