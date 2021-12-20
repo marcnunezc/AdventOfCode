@@ -21,14 +21,14 @@ def compute_orientations(position=[1,2,3]):
             aux_i = [j for j in range(len(position)) if j != i]
             if factor == 1:
                 if i==1:
-                    rotations=[(2,1), (1,-2), (-2,-1), (1,-2)]
+                    rotations=[(2,1), (1,-2), (-2,-1), (-1,2)]
                 else:
                     rotations=[(1,2), (2,-1), (-1,-2), (-2,1)]
             else:
                 if i==1:
                     rotations=[(1,2), (2,-1), (-1,-2), (-2,1)]
                 else:
-                    rotations=[(2,1), (1,-2), (-2,-1), (1,-2)]
+                    rotations=[(2,1), (1,-2), (-2,-1), (-1,2)]
             for ra,rb in rotations:
                 rotation = [facing[i]]
                 sign_a = 1 if ra > 0 else -1
@@ -86,6 +86,7 @@ def compute_connectivity(i,j,rotated_beacons, scanner_j, beacon_j,connecitvity_m
             return connectivity_map, translation_map, orientation_map, True
     return connectivity_map, translation_map, orientation_map, False
 
+start_time = time.time()
 filename = "input.txt"
 lines_list = open(filename).read().splitlines()
 scanners = read_input(lines_list)
@@ -94,39 +95,29 @@ connectivity_map = {}
 translation_map = {}
 orientation_map = {}
 
-# orientations = compute_orientations()
-# for i,scanner in enumerate(scanners):
-#     if i == 0:
-#         continue
-#     connectivity_map[i] = set()
-#     trans_time = 0
-#     rot_time = 0
-#     print("Computing connecitvity for scanner {}".format(i))
-#     for j,scanner_j in enumerate(scanners):
-#         if i == j:
-#             continue
-#         for beacon_j in scanner_j:
-#             for orientation in orientations:
-#                 ini_time = time.time()
-#                 rotated_beacons = compute_rotations(orientation, scanner)
-#                 rot_time += time.time()-ini_time
-#                 ini_time = time.time()
-#                 connectivity_map, translation_map, orientation_map, found = compute_connectivity(i,j,rotated_beacons,scanner_j, beacon_j,connectivity_map,translation_map,orientation_map)
-#                 trans_time += time.time()-ini_time
-#                 if found:
-#                     break
-#             if found:
-#                 break
-#     print("Time rotation {}".format(rot_time))
-#     print("Time trans {}".format(trans_time))
-
-# pickle.dump(connectivity_map, open(filename[0:5]+'_connect.pickle', 'wb'))
-# pickle.dump(translation_map, open(filename[0:5]+'_trans.pickle', 'wb'))
-# pickle.dump(orientation_map, open(filename[0:5]+'_orien.pickle', 'wb'))
-
-connectivity_map=pickle.load(open(filename[0:5]+'_connect.pickle', 'rb'))
-translation_map=pickle.load(open(filename[0:5]+'_trans.pickle', 'rb'))
-orientation_map=pickle.load(open(filename[0:5]+'_orien.pickle', 'rb'))
+orientations = compute_orientations()
+for i,scanner in enumerate(scanners):
+    if i == 0:
+        continue
+    connectivity_map[i] = set()
+    print("Computing connecitvity for scanner {}".format(i))
+    for j,scanner_j in enumerate(scanners):
+        if i == j:
+            continue
+        for orientation in orientations:
+            hashed_distances = Counter()
+            rotated_beacons = compute_rotations(orientation, scanner)
+            for beacon_i in rotated_beacons:
+                for beacon_j in scanner_j:
+                    distance_x = beacon_j[0]-beacon_i[0]
+                    distance_y = beacon_j[1]-beacon_i[1]
+                    distance_z = beacon_j[2]-beacon_i[2]
+                    hashed_distances[(distance_x, distance_y, distance_z)] += 1
+            for distance, count in hashed_distances.items():
+                if count >= 12:
+                    connectivity_map[i].add(j)
+                    translation_map[(i,j)] = [x for x in distance]
+                    orientation_map[(i,j)] = orientation
 
 communication_map = generate_communication_map(connectivity_map)
 all_beacons = {(beacon[0],beacon[1],beacon[2]) for beacon in scanners[0]}
@@ -159,3 +150,4 @@ for i in range(len(coords)):
     for j in range(len(coords)):
         max_distance = max(max_distance,sum([abs(x-y) for x,y in zip(coords[i], coords[j])]))
 print("Part 2", max_distance)
+print("Time", time.time()-start_time)
