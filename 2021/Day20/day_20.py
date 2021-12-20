@@ -3,12 +3,14 @@ def pretty_print(grid):
         print(''.join(row))
     print("")
 
-def pad_image(image, mode='.'):
+def pad_image(image, mode='.', repetitions=3):
     new_image = []
-    new_image.append([mode] * (len(image[0]) + 2))
+    for i in range(repetitions):
+        new_image.append([mode] * (len(image[0]) + 2*repetitions))
     for row in image:
-        new_image.append([mode] + row + [mode])
-    new_image.append([mode] * (len(image[0]) + 2))
+        new_image.append([mode]*repetitions  + row + [mode]*repetitions )
+    for i in range(repetitions):
+        new_image.append([mode] * (len(image[0]) + 2*repetitions))
     return new_image
 
 def get_neighbours(i,j):
@@ -24,9 +26,10 @@ def copy_image(image):
 
 def advance(input_image, mode, step):
     if step % 2 == 1:
-        input_image=pad_image(pad_image(pad_image(input_image)))
+        input_image=pad_image(input_image)
     else:
-        input_image=pad_image(pad_image(pad_image(input_image, mode),mode),mode)
+        input_image=pad_image(input_image, mode)
+
     new_image=copy_image(input_image)
     for i in range(len(input_image)):
         for j in range(len(input_image[i])):
