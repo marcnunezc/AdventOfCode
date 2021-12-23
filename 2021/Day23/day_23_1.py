@@ -1,12 +1,10 @@
 import re
-import copy
+import time
 from collections import defaultdict
 def pretty_print(room_map):
     for line in room_map:
         print("".join(line))
     print()
-
-
 
 def is_good_solution(current_room, char, pos):
     if char == 'A':
@@ -21,15 +19,19 @@ def is_good_solution(current_room, char, pos):
         raise(Exception("Invalid char", char))
 
 def move(room_map, ini_pos, destination_pos):
-    current_room_map = copy.deepcopy(room_map)
+    current_room_map = [[char for char in line] for line in room_map]
+
     if is_good_solution(current_room_map, current_room_map[ini_pos[0]][ini_pos[1]], ini_pos):
         return None, -1
+
     if destination_pos in forbidden_spots or current_room_map[destination_pos[0]][destination_pos[1]]=="#":
         return None,-1
         raise(Exception("Cant move to forbidden spot", destination_pos))
+
     if not current_room_map[destination_pos[0]][destination_pos[1]] == '.':
         return None,-1
         raise(Exception("Occupied destination spot"))
+
     if ini_pos[0] == 0 and destination_pos[0]==0:
         return None,-1
         raise(Exception("Cant stay in hallway"))
@@ -48,12 +50,11 @@ def move(room_map, ini_pos, destination_pos):
         return None,-1
         raise(Exception("Cant move to this room"))
 
-    if destination_pos[0] == 1:
-        if not current_room_map[2][destination_pos[1]] == char:
-            return None,-1
-            raise(Exception("Cant move here as bottom is not solved"))
-
-
+    if destination_pos[0] > 0:
+        for i in range(destination_pos[0]+1, len(current_room_map)):
+            if not current_room_map[i][destination_pos[1]] == char:
+                return None,-1
+                raise(Exception("Cant move here as bottom is not solved"))
 
     moves=0
     current_pos = [ini_pos[0], ini_pos[1]]
@@ -80,25 +81,18 @@ def move(room_map, ini_pos, destination_pos):
 
     return current_room_map, moves*cost[char]
 
-def check_if_board_ok(room_map):
-    return room_map[1][3] == 'A' and room_map[1][5] == 'B' and room_map[1][7] == 'C' and room_map[1][9] == 'D' and room_map[2][3] == 'A' and room_map[2][5] == 'B' and room_map[2][7] == 'C' and room_map[2][9] == 'D'
-
 def compute_candidate_starting_pos(room_map):
-    candidate_points = []
-    available_starters = [aux_point for aux_point in available_points if room_map[aux_point[0]][aux_point[1]] != '.']
-    for point in available_starters:
-        available_moves = [move(room_map, point, aux_point)[1] for aux_point in available_points]
-        if any([move != -1 for move in available_moves]):
-            candidate_points.append(point)
-    return candidate_points
+    return [aux_point for aux_point in available_points if room_map[aux_point[0]][aux_point[1]] != '.']
 
+def get_current_landing_points(room_map):
+    return [aux_point for aux_point in available_points if room_map[aux_point[0]][aux_point[1]] == '.']
 
 def neighbour_maps(current_tupled_map, visited):
     current_map = [list(line) for line in current_tupled_map]
     candidate_starters = compute_candidate_starting_pos(current_map)
     neighbour_list = []
     for starter in candidate_starters:
-        for aux_point in available_points:
+        for aux_point in get_current_landing_points(current_map):
             new_map, energy = move(current_map, starter, aux_point)
             if energy != -1:
                 new_tuple = tuple(tuple(line) for line in new_map)
@@ -106,10 +100,8 @@ def neighbour_maps(current_tupled_map, visited):
                     neighbour_list.append((new_tuple, energy))
     return neighbour_list
 
-import time
 
-import os
-filename = "test.txt"
+filename = "input.txt"
 start_time = time.time()
 lines_list = open(filename).read().splitlines()
 
@@ -144,24 +136,29 @@ pretty_print(room_map)
 current_node = tuple(tuple(line) for line in room_map)
 score[current_node] = 0
 visited = set()
-visited_neighs = set()
+visited_neighs = {}
 neighbour_time = 0
 update_time = 0
 while not current_node == ideal_tuple:
     ini_time = time.time()
     neighbors_list = neighbour_maps(current_node, visited)
     neighbour_time += time.time() - ini_time
-    ini_time = time.time()
     for neighbor, energy in neighbors_list:
         distance = score[current_node] + energy
         if distance < score[neighbor]:
             score[neighbor] = distance
-        visited_neighs.add(neighbor)
+            visited_neighs[neighbor] =  distance
     visited.add(current_node)
-    if current_node in visited_neighs:
-        visited_neighs.remove(current_node)
-    current_node = min(visited_neighs, key=lambda x: score[x])
+    if current_node in visited_neighs.keys():
+        del visited_neighs[current_node]
+
+    ini_time = time.time()
+    values = list( visited_neighs.values() )
+    keys = list( visited_neighs.keys() )
+    min_value = min( values )
+    current_node=  keys[ values.index( min_value ) ]
     update_time += time.time() - ini_time
+
 print("Part 1", score[ideal_tuple])
 print("Time", time.time()-start_time)
 print("neighbour time ", neighbour_time)
