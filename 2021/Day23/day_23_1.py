@@ -6,6 +6,10 @@ def pretty_print(room_map):
         print("".join(line))
     print()
 
+forbidden_spots = [[0,3], [0,5], [0,7], [0,9]]
+cost = {"A": 1,"B": 10,"C": 100,"D": 1000}
+destination_room = {"A": 3,"B": 5,"C": 7,"D": 9}
+
 def is_good_solution(current_room, pos):
     char = current_room[pos[0]][pos[1]]
     # print(len(current_room))
@@ -92,10 +96,10 @@ def move(room_map, ini_pos, destination_pos):
     return current_room_map, moves*cost[char]
 
 def compute_candidate_starting_pos(room_map):
-    return [aux_point for aux_point in available_points if room_map[aux_point[0]][aux_point[1]] != '.']
+    return [aux_point for aux_point in get_available_points(room_map) if room_map[aux_point[0]][aux_point[1]] != '.']
 
 def get_current_landing_points(room_map):
-    return [aux_point for aux_point in available_points if room_map[aux_point[0]][aux_point[1]] == '.']
+    return [aux_point for aux_point in  get_available_points(room_map) if room_map[aux_point[0]][aux_point[1]] == '.']
 
 def neighbour_maps(current_tupled_map, visited):
     current_map = [list(line) for line in current_tupled_map]
@@ -110,66 +114,63 @@ def neighbour_maps(current_tupled_map, visited):
                     neighbour_list.append((new_tuple, energy))
     return neighbour_list
 
+def get_available_points(room_map):
+    available_points = []
+    available_points.extend([[0,i] for i in range(1, 12) if [0,i] not in forbidden_spots])
+    available_points.extend([[1,3], [1,5], [1,7], [1,9]])
+    available_points.extend([[2,3], [2,5], [2,7], [2,9]])
+    if len(room_map) > 3:
+        available_points.extend([[3,3], [3,5], [3,7], [3,9]])
+        available_points.extend([[4,3], [4,5], [4,7], [4,9]])
+    available_points = [tuple(point) for point in available_points]
+    return available_points
 
-filename = "test.txt"
-start_time = time.time()
-lines_list = open(filename).read().splitlines()
+def solve_dijkstra(room_map):
 
-forbidden_spots = [[0,3], [0,5], [0,7], [0,9]]
-cost = {"A": 1,"B": 10,"C": 100,"D": 1000}
-destination_room = {"A": 3,"B": 5,"C": 7,"D": 9}
-energy = 0
-available_points = []
-available_points.extend([[0,i] for i in range(1, 12) if [0,i] not in forbidden_spots])
-available_points.extend([[1,3], [1,5], [1,7], [1,9]])
-available_points.extend([[2,3], [2,5], [2,7], [2,9]])
-available_points = [tuple(point) for point in available_points]
+    score = defaultdict(lambda : 1e6)
+    current_node = tuple(tuple(line) for line in room_map)
+    score[current_node] = 0
+    visited = set()
+    visited_neighs = {}
+    ideal_map = get_ideal_map(room_map)
+    ideal_tuple = tuple(tuple(line) for line in ideal_map)
+    while not current_node == ideal_tuple:
+        neighbors_list = neighbour_maps(current_node, visited)
+        for neighbor, energy in neighbors_list:
+            distance = score[current_node] + energy
+            if distance < score[neighbor]:
+                score[neighbor] = distance
+                visited_neighs[neighbor] =  distance
+        visited.add(current_node)
+        if current_node in visited_neighs.keys():
+            del visited_neighs[current_node]
+        values = list( visited_neighs.values() )
+        keys = list( visited_neighs.keys() )
+        min_value = min( values )
+        current_node=  keys[ values.index( min_value ) ]
 
-room_map = [ [char for char in line] for line in lines_list[1:3]]
-room_map.append(['#']*2+[char for char in lines_list[3][2:]]+['#']*2)
-energy=0
+    return score[ideal_tuple]
 
-ideal_map = [[char for char in line] for line in room_map]
-ideal_map[1][3] = 'A'
-ideal_map[1][5] = 'B'
-ideal_map[1][7] = 'C'
-ideal_map[1][9] = 'D'
-ideal_map[2][3] = 'A'
-ideal_map[2][5] = 'B'
-ideal_map[2][7] = 'C'
-ideal_map[2][9] = 'D'
-pretty_print(ideal_map)
-ideal_tuple = tuple(tuple(line) for line in ideal_map)
+def get_ideal_map(room_map):
+    ideal_map = [[char for char in line] for line in room_map[0:2]]
+    ideal_map[1][3] = 'A'
+    ideal_map[1][5] = 'B'
+    ideal_map[1][7] = 'C'
+    ideal_map[1][9] = 'D'
+    ideal_map.append(ideal_map[1])
+    if len(room_map) > 3:
+        ideal_map.append(ideal_map[1])
+        ideal_map.append(ideal_map[1])
+    return ideal_map
 
-score = defaultdict(lambda : 1e6)
-pretty_print(room_map)
-current_node = tuple(tuple(line) for line in room_map)
-score[current_node] = 0
-visited = set()
-visited_neighs = {}
-neighbour_time = 0
-update_time = 0
-while not current_node == ideal_tuple:
-    ini_time = time.time()
-    neighbors_list = neighbour_maps(current_node, visited)
-    neighbour_time += time.time() - ini_time
-    for neighbor, energy in neighbors_list:
-        distance = score[current_node] + energy
-        if distance < score[neighbor]:
-            score[neighbor] = distance
-            visited_neighs[neighbor] =  distance
-    visited.add(current_node)
-    if current_node in visited_neighs.keys():
-        del visited_neighs[current_node]
+if __name__=="__main__":
 
-    ini_time = time.time()
-    values = list( visited_neighs.values() )
-    keys = list( visited_neighs.keys() )
-    min_value = min( values )
-    current_node=  keys[ values.index( min_value ) ]
-    update_time += time.time() - ini_time
+    start_time = time.time()
 
-print("Part 1", score[ideal_tuple])
-print("neighbour time ", neighbour_time)
-print("update time ", update_time)
-print("Time", time.time()-start_time)
+    lines_list = open("input.txt").read().splitlines()
+
+    room_map = [ [char for char in line] for line in lines_list[1:3]]
+    room_map.append(['#']*2+[char for char in lines_list[3][2:]]+['#']*2)
+
+    print("Part 1", solve_dijkstra(room_map))
+    print("Time", time.time()-start_time)
