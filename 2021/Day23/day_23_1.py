@@ -6,22 +6,32 @@ def pretty_print(room_map):
         print("".join(line))
     print()
 
-def is_good_solution(current_room, char, pos):
-    if char == 'A':
-        return (pos[0] == 2 and pos[1] == 3) or (current_room[1][3]=='A' and (pos[0] == 2 and pos[1] == 3))
-    elif char == 'B':
-        return (pos[0] == 2 and pos[1] == 5) or (current_room[1][5]=='B'  and (pos[0] == 2 and pos[1] == 5))
-    elif char == 'C':
-        return (pos[0] == 2 and pos[1] == 7) or (current_room[1][7]=='C'  and (pos[0] == 2 and pos[1] == 7))
-    elif char == 'D':
-        return (pos[0] == 2 and pos[1] == 9) or (current_room[1][9]=='D' and (pos[0] == 2 and pos[1] == 9))
-    else:
-        raise(Exception("Invalid char", char))
+def is_good_solution(current_room, pos):
+    char = current_room[pos[0]][pos[1]]
+    # print(len(current_room))
+    is_already_good_solution = False
+    for i in range(len(current_room)-1, pos[0]-1, -1):
+        if char == 'A' and pos[1] == 3:
+            if current_room[i][pos[1]] == char:
+                is_already_good_solution = True
+        elif char == 'B'  and pos[1]==5:
+            if current_room[i][pos[1]] == char:
+                is_already_good_solution = True
+        elif char == 'C'  and pos[1]==7:
+            if current_room[i][pos[1]] == char:
+                is_already_good_solution = True
+        elif char == 'D'  and pos[1]==9:
+            if current_room[i][pos[1]] == char:
+                is_already_good_solution = True
+
+        if not is_already_good_solution:
+            return False
+    return True
 
 def move(room_map, ini_pos, destination_pos):
     current_room_map = [[char for char in line] for line in room_map]
 
-    if is_good_solution(current_room_map, current_room_map[ini_pos[0]][ini_pos[1]], ini_pos):
+    if is_good_solution(current_room_map, ini_pos):
         return None, -1
 
     if destination_pos in forbidden_spots or current_room_map[destination_pos[0]][destination_pos[1]]=="#":
@@ -101,7 +111,7 @@ def neighbour_maps(current_tupled_map, visited):
     return neighbour_list
 
 
-filename = "input.txt"
+filename = "test.txt"
 start_time = time.time()
 lines_list = open(filename).read().splitlines()
 
@@ -160,6 +170,6 @@ while not current_node == ideal_tuple:
     update_time += time.time() - ini_time
 
 print("Part 1", score[ideal_tuple])
-print("Time", time.time()-start_time)
 print("neighbour time ", neighbour_time)
 print("update time ", update_time)
+print("Time", time.time()-start_time)
