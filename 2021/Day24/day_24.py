@@ -49,28 +49,22 @@ class ALU:
     def inp(self, a, b):
         if not isinstance(b, int):
             raise TypeError('Invalid type, expected int and got', type(b))
-        # print("Input:", b, "stored in", a)
         self.assign_value(a, b)
 
     def add(self, a, b):
         value, b =  self.get_values(a, b)
-        # print("Add: ", value, "by", b)
-
         value += b
         self.assign_value(a, value)
 
     def mul(self, a, b):
         value, b =  self.get_values(a, b)
-        # print("Mul: ", value, "by", b)
         value *= b
-
         self.assign_value(a, value)
 
     def div(self, a, b):
         value, b =  self.get_values(a, b)
         if b==0:
             raise(ZeroDivisionError)
-        # print("Div: ", value, "by", b)
         value //= b
 
         self.assign_value(a, value)
@@ -84,7 +78,6 @@ class ALU:
 
     def eql(self, a, b):
         value, b =  self.get_values(a, b)
-        # print("Eql: ", value, "==", b)
         value = int(value==b)
         self.assign_value(a, value)
 
@@ -109,18 +102,14 @@ def process_input(lines_list, string_to_read, alu):
 
     return alu.return_value('x'), alu.return_value('y'), alu.return_value('z'), alu.return_value('w')
 
-
-
 class ReverseEngineeringALU(ALU):
-    def __init__(self, mode='MAXIMIZE'):
+    def __init__(self, mode='maximize'):
         super().__init__()
-        self.constraints = []
         self.constraints = {value:0 for value in range(1,15)}
         self.n_input = 0
         self.mode = mode
 
     def assign_value(self,a, value):
-        print ("Assigning", value, "to", a)
         if a == 'x':
             self.x = value
         elif a == 'y':
@@ -138,37 +127,29 @@ class ReverseEngineeringALU(ALU):
 
     def add(self, a, b):
         value, b =  self.get_values(a, b)
-        print("Add: ", value, "by", b)
         if isinstance(value, int) and isinstance(b, int):
             value  = value+b
         elif isinstance(b, int):
             if b>0:
-                value  = str(value)+"+"+str(b)
+                value = str(value)+"+"+str(b)
             elif b<0:
-                value  = str(value)+"-"+str(abs(b))
+                value = str(value)+"-"+str(abs(b))
             else:
-                value  = str(value)
+                value = str(value)
         elif isinstance(value, int):
             if value == 0:
                 value = b
-            else:
-                value
-
-
         else:
             if value == "0":
                 value = str(b)
-
             elif b == "0":
                 value = str(value)
             else:
-                value  = str(value)+"+"+str(b)
-
+                value = str(value)+"+"+str(b)
         self.assign_value(a, value)
 
     def mul(self, a, b):
         value, b =  self.get_values(a, b)
-        print("Mul: ", value, "by", b)
         if b == 0:
             value = 0
         elif b==1:
@@ -184,7 +165,6 @@ class ReverseEngineeringALU(ALU):
 
     def div(self, a, b):
         value, b =  self.get_values(a, b)
-        print("Div: ", value, "by", b)
         if b == 0:
             raise(ZeroDivisionError)
         elif isinstance(value, int) and isinstance(b, int):
@@ -197,16 +177,12 @@ class ReverseEngineeringALU(ALU):
 
     def mod(self, a, b):
         value, b =  self.get_values(a, b)
-        print("Mod of ", value, "by", b)
         if b == 0:
             raise(ZeroDivisionError)
         elif isinstance(value, int) and isinstance(b, int):
             value = value%b
         elif isinstance(value, str):
             numbers = re.findall("(\+\d+|-\d+)", value)
-            # print("numbres", numbers, int(numbers[0]))
-            if len(numbers) >1:
-                print("Got more than 1 number", numbers)
             if isinstance(b, int):
                 if len(numbers)==1 and int(numbers[0])+9 < b:
                     value = 0
@@ -214,49 +190,32 @@ class ReverseEngineeringALU(ALU):
                     value ="("+str(value)+")%"+str(b)
             else:
                 value ="("+str(value)+")%("+str(b)+")"
-            self.assign_value(a, value)
+        self.assign_value(a, value)
 
     def eql(self, a, b):
         value, b =  self.get_values(a, b)
-        print("Eql: ", value, "==", b)
         if isinstance(value, str) and "-" in value:
             variables = re.findall("w\[\d\]", value)
-            this_value = re.findall("-\d+", value)
-            print("DETECTED NEGASTIVE", this_value)
-            found = False
-            this_w_value =int(re.findall("\d+", b)[0])
-            found_w = 0
-            prev_value = 0
+            this_w_value = self.n_input-1
+            found_w, prev_w = 0, 0
             test_range = range(1,10) if self.mode == "maximize" else range(9,0,-1)
             for test_w in test_range:
-                for test in range(1, 10):
-                    w = [test for i in range(0, this_w_value)]
-                    # correct_values =
+                for test_prev in range(1, 10):
+                    w = [test_prev for i in range(0, this_w_value)]
                     eval_value = eval(value)
                     if eval_value-test_w == 0:
                         found_w=test_w
-                        prev_value = test
+                        prev_w = test_prev
             if found_w > 0:
                 self.constraints[this_w_value+1] = found_w
                 for variable in variables:
                     digit = int(re.findall("\d+", variable)[0])
                     if this_w_value == digit+1:
-                        self.constraints[this_w_value] = prev_value
+                        self.constraints[this_w_value] = prev_w
             value = 1
-        elif isinstance(b, str) and "w" in b:
-            print("Value, b", value, b)
-            # numbers = re.findall("(\+\d+|-\d+)", value)
-            if isinstance(value, int):
-                if (value>8):
-                    print("Impossible that ", value,"is equal to ", b)
-                    value = 0
-                else:
-                    stop
-            else:
-                print("assuming value", value, "is not equal to ", b)
-                value = 0
+        elif isinstance(b, str):
+            value = 0
         elif b == 0:
-            # print("Evaluation eql with", value, "and", b)
             value = int(value == 0)
         self.assign_value(a, value)
 
