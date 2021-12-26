@@ -228,14 +228,13 @@ def find_first_model_number(permutations):
 
 if __name__ == '__main__':
 
-    import itertools
-    import re
+    import itertools, re
 
     lines_list = open('input.txt').read().splitlines()
 
     hacker_alu = ReverseEngineeringALU(mode="maximize")
     process_input(lines_list, "66666666666666", hacker_alu)
-    permutations = [str(value) if value > 0 else list("98765421") for value in hacker_alu.constraints.values()]
+    permutations = [str(value) if value > 0 else list("987654321") for value in hacker_alu.constraints.values()]
     print("Part 1", find_first_model_number(permutations))
 
     hacker_alu = ReverseEngineeringALU(mode="minimize")
