@@ -1,5 +1,7 @@
 import re
 import time
+import functools
+import heapq
 from collections import defaultdict
 def pretty_print(room_map):
     for line in room_map:
@@ -96,10 +98,14 @@ def move(room_map, ini_pos, destination_pos):
     return current_room_map, moves*cost[char]
 
 def compute_candidate_starting_pos(room_map):
-    return [aux_point for aux_point in get_available_points(room_map) if room_map[aux_point[0]][aux_point[1]] != '.']
+    for aux_point in get_available_points(len(room_map)):
+        if room_map[aux_point[0]][aux_point[1]] != '.':
+            yield aux_point
 
 def get_current_landing_points(room_map):
-    return [aux_point for aux_point in  get_available_points(room_map) if room_map[aux_point[0]][aux_point[1]] == '.']
+    for aux_point in  get_available_points(len(room_map)):
+        if room_map[aux_point[0]][aux_point[1]] == '.':
+            yield aux_point
 
 def neighbour_maps(current_tupled_map, visited):
     current_map = [list(line) for line in current_tupled_map]
@@ -114,12 +120,13 @@ def neighbour_maps(current_tupled_map, visited):
                     neighbour_list.append((new_tuple, energy))
     return neighbour_list
 
-def get_available_points(room_map):
+@functools.lru_cache(maxsize=None)
+def get_available_points(len_room_map):
     available_points = []
     available_points.extend([[0,i] for i in range(1, 12) if [0,i] not in forbidden_spots])
     available_points.extend([[1,3], [1,5], [1,7], [1,9]])
     available_points.extend([[2,3], [2,5], [2,7], [2,9]])
-    if len(room_map) > 3:
+    if len_room_map > 3:
         available_points.extend([[3,3], [3,5], [3,7], [3,9]])
         available_points.extend([[4,3], [4,5], [4,7], [4,9]])
     available_points = [tuple(point) for point in available_points]
@@ -131,24 +138,22 @@ def solve_dijkstra(room_map):
     current_node = tuple(tuple(line) for line in room_map)
     score[current_node] = 0
     visited = set()
-    visited_neighs = {}
     ideal_map = get_ideal_map(room_map)
     ideal_tuple = tuple(tuple(line) for line in ideal_map)
+    heap_neighs = []
+    heapq.heappush(heap_neighs, (0,current_node))
     while not current_node == ideal_tuple:
+        _, current_node = heapq.heappop(heap_neighs)
+        if current_node in visited:
+            continue
         neighbors_list = neighbour_maps(current_node, visited)
         for neighbor, energy in neighbors_list:
             distance = score[current_node] + energy
             if distance < score[neighbor]:
                 score[neighbor] = distance
-                visited_neighs[neighbor] =  distance
-        visited.add(current_node)
-        if current_node in visited_neighs.keys():
-            del visited_neighs[current_node]
-        values = list( visited_neighs.values() )
-        keys = list( visited_neighs.keys() )
-        min_value = min( values )
-        current_node=  keys[ values.index( min_value ) ]
+                heapq.heappush(heap_neighs, (distance, neighbor))
 
+        visited.add(current_node)
     return score[ideal_tuple]
 
 def get_ideal_map(room_map):
