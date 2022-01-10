@@ -1,27 +1,29 @@
 from collections import defaultdict
+import heapq
 
 def compute_score(max_i, max_j, evaluate_risk):
     score = defaultdict(lambda : 1e6)
     score[(0,0)] = 0
     visited = set()
-    visited_neighs = set()
     current_node = (0,0)
+    heap_neighs = []
+    heapq.heappush(heap_neighs, (0,(0,0)))
     while not current_node == (max_i-1, max_j-1):
-        i, j = current_node
+        current_distance, current_node = heapq.heappop(heap_neighs)
+        if current_node in visited:
+            continue
 
+        i, j = current_node
         neighbors = [(evaluate_risk(m,n), m, n) for m,n in [(i-1,j),(i+1,j),(i,j-1),(i,j+1)] \
                     if 0 <= m < max_i and 0 <= n < max_j  \
                         and not (m,n) in visited]
+        visited.add(current_node)
         for neighbor in neighbors:
             neigh_value, n_i, n_j = neighbor
             distance = score[current_node] + neigh_value
             if distance < score[(n_i,n_j)]:
                 score[(n_i,n_j)] = distance
-            visited_neighs.add((n_i,n_j))
-        visited.add(current_node)
-        if current_node in visited_neighs:
-            visited_neighs.remove(current_node)
-        current_node = min(visited_neighs, key=lambda x: score[x])
+            heapq.heappush(heap_neighs, (distance, (n_i,n_j)))
     return score
 
 def evaluate_risk_1(i,j):
