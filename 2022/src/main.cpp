@@ -5,6 +5,14 @@ bool DayFactory::Register(std::string name, std::function<void()> func) {
     return true;
 }
 
+void print_header() {
+    cout << "    ___   ____  _________  ___"     << endl;
+    cout << "   /   | / __ \\/ ____/__ \\|__ \\" << endl;
+    cout << "  / /| |/ / / / /    __/ /__/ /"    << endl;
+    cout << " / ___ / /_/ / /___ / __// __/"     << endl;
+    cout << "/_/  |_\\____/\\____//____/____/"   << endl;
+}
+
 #include "include.h"
 int main(int argc, char *argv[]) {
 
@@ -19,6 +27,7 @@ int main(int argc, char *argv[]) {
         cout << "Day with name: " << name << " not found" << endl;
         exit(1);
     } else {
+        print_header();
         cout << "Running: " << name  << endl;
         DayFactory::Days[name]();
     }
