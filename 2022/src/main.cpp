@@ -16,6 +16,8 @@ void print_header() {
 #include "include.h"
 int main(int argc, char *argv[]) {
 
+    print_header();
+
     if (argc != 2) {
         cout << "Please provide day and part in the format: Day##_#" << endl;
         cout << "e.g: aoc22 Day01_1 < Day01/input.txt" << endl;
@@ -27,7 +29,6 @@ int main(int argc, char *argv[]) {
         cout << "Day with name: " << name << " not found" << endl;
         exit(1);
     } else {
-        print_header();
         cout << "Running: " << name  << endl;
         DayFactory::Days[name]();
     }
