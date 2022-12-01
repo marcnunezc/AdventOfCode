@@ -2,6 +2,9 @@
 #include <vector>
 #include <map>
 #include <iostream>
+#include <string>
+#include <numeric>
+
 using namespace std;
 
 #define AOC_DAY(name) \
