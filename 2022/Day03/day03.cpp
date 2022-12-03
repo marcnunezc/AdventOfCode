@@ -29,12 +29,11 @@ AOC_DAY(Day03_1){
 AOC_DAY(Day03_2){
     std::string line;
     std::map<char, int> score = compute_score();
-    int total = 0, group = 0;
+    int total = 0;
     std::vector<std::string> group_rucksack;
     while(getline(cin, line)) {
         group_rucksack.push_back(line);
-        group++;
-        if (group < 3)
+        if (group_rucksack.size() < 3)
             continue;
         else {
             std::string first = group_rucksack[0];
@@ -44,7 +43,6 @@ AOC_DAY(Day03_2){
                     break;
                 }
             }
-            group = 0;
             group_rucksack.clear();
         }
     }
