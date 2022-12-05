@@ -25,32 +25,7 @@ std::vector<std::vector<char>> get_inital_stacks() {
     return stacks;
 }
 
-
-
-AOC_DAY(Day05_1){
-    std::vector<std::vector<char>> stacks = get_inital_stacks();
-    std::string line;
-    while(getline(cin, line)) {
-        if (line.empty())
-            continue;
-        std::vector<char> tmp_stack;
-        int n_moves, source, destination;
-        sscanf(line.c_str(), "move %i from %i to %i", &n_moves, &source, &destination);
-
-        for (int i=0; i<n_moves; i++) {
-            stacks[destination-1].push_back(stacks[source-1].back());
-            stacks[source-1].pop_back();
-        }
-    }
-    for (auto vec : stacks) {
-        cout << vec.back();
-    }
-    cout << endl;
-}
-
-AOC_DAY(Day05_2) {
-
-    std::vector<std::vector<char>> stacks = get_inital_stacks();
+void rearrange_stacks(std::vector<std::vector<char>>& stacks , std::function<int(int, int)> compute_index) {
     std::string line;
     while(getline(cin, line)) {
         if (line.empty())
@@ -60,15 +35,31 @@ AOC_DAY(Day05_2) {
 
         std:vector<char> tmp_stack(n_moves, ' ');
         for (int i=0; i<tmp_stack.size(); i++) {
-            tmp_stack[n_moves-i-1] = stacks[source-1].back();
+            tmp_stack[compute_index(i, n_moves)] = stacks[source-1].back();
             stacks[source-1].pop_back();
         }
         stacks[destination-1].insert(stacks[destination-1].end(), tmp_stack.begin(), tmp_stack.end());
     }
+}
 
+AOC_DAY(Day05_1){
 
+    std::vector<std::vector<char>> stacks = get_inital_stacks();
+    rearrange_stacks(stacks, [](int j, int total) {return j;});
     for (auto vec : stacks) {
         cout << vec.back();
     }
     cout << endl;
+
+}
+
+AOC_DAY(Day05_2) {
+
+    std::vector<std::vector<char>> stacks = get_inital_stacks();
+    rearrange_stacks(stacks, [](int j, int total) {return total-j-1;});
+    for (auto vec : stacks) {
+        cout << vec.back();
+    }
+    cout << endl;
+
 }
