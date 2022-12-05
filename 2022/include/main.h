@@ -5,6 +5,7 @@
 #include <string>
 #include <numeric>
 #include <set>
+#include <cstring>
 
 using namespace std;
 
