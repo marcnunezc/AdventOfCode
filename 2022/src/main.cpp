@@ -1,4 +1,5 @@
 #include "main.h"
+#include <chrono>
 std::map<std::string, std::function<void()>> DayFactory::Days;
 bool DayFactory::Register(std::string name, std::function<void()> func) {
     Days[name] = std::move(func);
@@ -30,7 +31,11 @@ int main(int argc, char *argv[]) {
         exit(1);
     } else {
         cout << "Running: " << name  << endl;
+        auto start = std::chrono::high_resolution_clock::now();
         DayFactory::Days[name]();
+        auto stop = std::chrono::high_resolution_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
+        cout << "Time: " << duration.count() << " ms"<<endl;
     }
 
 }
