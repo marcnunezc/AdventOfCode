@@ -23,7 +23,7 @@ AOC_DAY(Day03_1){
             }
         }
     }
-    cout << total << endl;
+    return std::to_string(total);
 }
 
 AOC_DAY(Day03_2){
@@ -46,5 +46,5 @@ AOC_DAY(Day03_2){
             group_rucksack.clear();
         }
     }
-    cout << total << endl;
+    return std::to_string(total);
 }

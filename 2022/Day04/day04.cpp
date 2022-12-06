@@ -7,7 +7,7 @@ AOC_DAY(Day04_1){
             counter++;
         }
     }
-    cout << counter << endl;
+    return std::to_string(counter);
 }
 
 AOC_DAY(Day04_2){
@@ -19,5 +19,5 @@ AOC_DAY(Day04_2){
             counter++;
         }
     }
-    cout << counter << endl;
+    return std::to_string(counter);
 }

@@ -10,7 +10,7 @@ AOC_DAY(Day01_1){
             current += stoi(line);
         }
     }
-    cout << max << endl;
+    return std::to_string(max);
 }
 
 AOC_DAY(Day01_2){
@@ -37,5 +37,5 @@ AOC_DAY(Day01_2){
     }
     get_max_values();
 
-    cout << std::accumulate(max_values.begin(), max_values.end(), 0) << endl;
+    return std::to_string(std::accumulate(max_values.begin(), max_values.end(), 0));
 }

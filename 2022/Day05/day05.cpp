@@ -46,20 +46,20 @@ AOC_DAY(Day05_1){
 
     std::vector<std::vector<char>> stacks = get_inital_stacks();
     rearrange_stacks(stacks, [](int j, int total) {return j;});
+    std::stringstream ss;
     for (auto vec : stacks) {
-        cout << vec.back();
+        ss << vec.back();
     }
-    cout << endl;
-
+    return ss.str();
 }
 
 AOC_DAY(Day05_2) {
 
     std::vector<std::vector<char>> stacks = get_inital_stacks();
     rearrange_stacks(stacks, [](int j, int total) {return total-j-1;});
+    std::stringstream ss;
     for (auto vec : stacks) {
-        cout << vec.back();
+        ss << vec.back();
     }
-    cout << endl;
-
+    return ss.str();
 }

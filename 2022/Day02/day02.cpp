@@ -24,7 +24,7 @@ AOC_DAY(Day02_1){
         cin >> me;
         total += win_score[{him, me}] + score[me];
     }
-    cout << total << endl;
+    return std::to_string(total);
 }
 
 AOC_DAY(Day02_2){
@@ -60,5 +60,5 @@ AOC_DAY(Day02_2){
         char move = selected_move[{him, expected}];
         total += action[expected] + score[move];
     }
-    cout << total << endl;
+    return std::to_string(total);
 }
