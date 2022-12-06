@@ -33,7 +33,7 @@ void rearrange_stacks(std::vector<std::vector<char>>& stacks , std::function<int
         int n_moves, source, destination;
         sscanf(line.c_str(), "move %i from %i to %i", &n_moves, &source, &destination);
 
-        std:vector<char> tmp_stack(n_moves, ' ');
+        std::vector<char> tmp_stack(n_moves, ' ');
         for (int i=0; i<tmp_stack.size(); i++) {
             tmp_stack[compute_index(i, n_moves)] = stacks[source-1].back();
             stacks[source-1].pop_back();
