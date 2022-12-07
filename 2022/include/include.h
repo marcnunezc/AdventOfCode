@@ -4,3 +4,4 @@
 #include "day04.cpp"
 #include "day05.cpp"
 #include "day06.cpp"
+#include "day07.cpp"
