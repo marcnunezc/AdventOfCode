@@ -42,10 +42,12 @@ int main(int argc, char *argv[]) {
             std::ifstream in(input_file);
             std::cin.rdbuf(in.rdbuf()); //redirect std::cin to in.txt!
             auto start = std::chrono::high_resolution_clock::now();
-            cout << it->second() << " ";
+            std::string output = it->second();
+            cout << output << " ";
             auto stop = std::chrono::high_resolution_clock::now();
             auto duration = std::chrono::duration<double, std::milli>(stop - start);
-            cout << "Time: " << duration.count() << " ms"<<endl;
+            std::string ok = expected_input[it->first].compare(output)==0 ? "\033[1m\033[32mOK\033[0m" : "\033[1m\033[31mFAILED\033[0m" ;
+            cout << "Time: " << duration.count() << " ms "<< ok << endl;
         }
         return 0;
     }
