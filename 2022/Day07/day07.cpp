@@ -39,13 +39,13 @@ class FileSystem {
 
         }
 
-        int FillSizesMap(std::vector<int>& sizes_vector) {
+        int FillSizesVector(std::vector<int>& sizes_vector) {
             int size=0;
             for (auto it = mFiles.begin(); it != mFiles.end(); it++)
                 size += it->second->GetSize();
 
             for (auto it = mDirs.begin(); it != mDirs.end(); it++)
-                size += it->second->FillSizesMap(sizes_vector);
+                size += it->second->FillSizesVector(sizes_vector);
 
             sizes_vector.push_back(size);
             return size;
@@ -98,7 +98,7 @@ AOC_DAY(Day07_1){
     }
 
     std::vector<int> sizes_vector;
-    root_dir.FillSizesMap(sizes_vector);
+    root_dir.FillSizesVector(sizes_vector);
 
     int total=0;
     for (auto value : sizes_vector) {
@@ -119,7 +119,7 @@ AOC_DAY(Day07_2) {
     }
 
     std::vector<int> sizes_vector;
-    root_dir.FillSizesMap(sizes_vector);
+    root_dir.FillSizesVector(sizes_vector);
 
     int min_valid_dir = 70000000;
     for (auto value : sizes_vector) {
