@@ -25,11 +25,14 @@ class FileSystem {
             return mFiles[name];
         }
 
-        void PrintDirsAndFiles() {
-            if (mpParentDir)
-                cout << "--- " << mName << "(dir) with parent:" << mpParentDir->GetName() <<endl;
+        void PrintDirsAndFiles(std::string header) {
+            cout << header << mName << " (dir)" << endl;
             for (auto it = mFiles.begin(); it != mFiles.end(); it++) {
-                cout << "------- " << it->first << " " << it->second->GetSize() << endl;
+                int size = it->second->GetSize();
+                if (size==0)
+                    it->second->PrintDirsAndFiles("  "+header);
+                else
+                    cout <<"  "+header<< it->first << " " << size << endl;
             }
         }
 
@@ -82,7 +85,7 @@ AOC_DAY(Day07_1){
     while (getline(cin, line)) {
         parse_command(line, &root_dir);
     }
-
+    // root_dir.PrintDirsAndFiles("- ");
     std::vector<int> sizes_vector;
     root_dir.FillSizesVector(sizes_vector);
 
