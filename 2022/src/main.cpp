@@ -44,8 +44,8 @@ int main(int argc, char *argv[]) {
             auto start = std::chrono::high_resolution_clock::now();
             cout << it->second() << " ";
             auto stop = std::chrono::high_resolution_clock::now();
-            auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-            cout << "Time: " << duration.count() << " microseconds"<<endl;
+            auto duration = std::chrono::duration<double, std::milli>(stop - start);
+            cout << "Time: " << duration.count() << " ms"<<endl;
         }
         return 0;
     }
@@ -57,7 +57,7 @@ int main(int argc, char *argv[]) {
         auto start = std::chrono::high_resolution_clock::now();
         cout << DayFactory::Days[name]() << endl;
         auto stop = std::chrono::high_resolution_clock::now();
-        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
+        auto duration = std::chrono::duration<double, std::milli>(stop - start);
         cout << "Time: " << duration.count() << " ms"<<endl;
     }
 
