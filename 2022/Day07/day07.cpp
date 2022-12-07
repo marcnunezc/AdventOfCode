@@ -6,6 +6,12 @@ class FileSystem {
     std::map<std::string, FileSystem*> mFiles;
     public:
         FileSystem(std::string name, std::size_t size, FileSystem* p_parent_dir=nullptr) : mName(name), mSize(size), mpParentDir(p_parent_dir) {};
+        ~FileSystem() {
+            for (auto it = mFiles.begin(); it != mFiles.end(); it++)
+                delete it->second;
+            for (auto it = mDirs.begin(); it != mDirs.end(); it++)
+                delete it->second;
+        }
         FileSystem* pGetParent() {
             return mpParentDir;
         }
@@ -51,9 +57,6 @@ class FileSystem {
             return size;
         }
 };
-
-
-
 
 void parse_command(std::string command, FileSystem* root_dir) {
     if (command[0] == '$') {
