@@ -1,4 +1,4 @@
-void check_row_column_visibility(int i, std::vector<std::string> tree_array, std::vector<std::vector<bool>>& visited) {
+void check_row_column_visibility(int i, std::vector<std::string>& tree_array, std::vector<std::vector<bool>>& visited) {
 
     int max_size = tree_array.size();
     // left to right
@@ -38,7 +38,7 @@ void check_row_column_visibility(int i, std::vector<std::string> tree_array, std
     }
 }
 
-int compute_dist(size_t i, size_t j, std::vector<std::string> tree_array) {
+int compute_dist(size_t i, size_t j, std::vector<std::string>& tree_array) {
     int value = tree_array[i][j];
     int dist = 1;
     size_t start = 0;
