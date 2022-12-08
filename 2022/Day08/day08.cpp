@@ -1,8 +1,9 @@
-bool is_visible(int i, int j, std::vector<std::string> tree_array) {
+bool is_visible(size_t i, size_t j, std::vector<std::string> tree_array) {
     int value = tree_array[i][j];
-    //left
+
     bool blocked = false;
-    for (int m = i-1; m > -1; m--) {
+    size_t start=0;
+    for (size_t m : std::ranges::iota_view{start, i} | std::views::reverse) {
         if (tree_array[m][j]>=value) {
             blocked = true;
             break;
@@ -12,7 +13,7 @@ bool is_visible(int i, int j, std::vector<std::string> tree_array) {
 
     //right
     blocked = false;
-    for (int m = i+1; m < tree_array.size(); m++) {
+    for (size_t m : std::ranges::iota_view{i+1, tree_array.size()}) {
         if (tree_array[m][j]>=value) {
             blocked = true;
             break;
@@ -22,7 +23,7 @@ bool is_visible(int i, int j, std::vector<std::string> tree_array) {
 
     //up
     blocked = false;
-    for (int m = j-1; m > -1; m--) {
+    for (size_t m : std::ranges::iota_view{start, j} | std::views::reverse) {
         if (tree_array[i][m]>=value) {
             blocked = true;
             break;
@@ -32,7 +33,7 @@ bool is_visible(int i, int j, std::vector<std::string> tree_array) {
 
     //down
     blocked = false;
-    for (int m = j+1; m < tree_array.size(); m++) {
+    for (size_t m : std::ranges::iota_view{j+1, tree_array.size()}) {
         if (tree_array[i][m]>=value) {
             blocked = true;
             break;
@@ -43,12 +44,14 @@ bool is_visible(int i, int j, std::vector<std::string> tree_array) {
     return false;
 }
 
-int compute_dist(int i, int j, std::vector<std::string> tree_array) {
+int compute_dist(size_t i, size_t j, std::vector<std::string> tree_array) {
     int value = tree_array[i][j];
     int dist = 1;
+    size_t start = 0;
+
     //left
     int trees = 0;
-    for (int m = i-1; m > -1; m--) {
+    for (size_t m : std::ranges::iota_view{start, i} | std::views::reverse) {
         trees++;
         if (tree_array[m][j]>=value || m == 0) {
             dist *= trees;
@@ -58,7 +61,7 @@ int compute_dist(int i, int j, std::vector<std::string> tree_array) {
 
     //right
     trees = 0;
-    for (int m = i+1; m < tree_array.size(); m++) {
+    for (size_t m : std::ranges::iota_view{i+1, tree_array.size()}) {
         trees++;
         if (tree_array[m][j]>=value || m == tree_array.size()-1) {
             dist *= trees;
@@ -68,7 +71,7 @@ int compute_dist(int i, int j, std::vector<std::string> tree_array) {
 
     //up
     trees = 0;
-    for (int m = j-1; m > -1; m--) {
+    for (size_t m : std::ranges::iota_view{start, j} | std::views::reverse) {
         trees++;
         if (tree_array[i][m]>=value || m == 0) {
             dist *= trees;
@@ -78,7 +81,7 @@ int compute_dist(int i, int j, std::vector<std::string> tree_array) {
 
     //down
     trees = 0;
-    for (int m = j+1; m < tree_array.size(); m++) {
+    for (size_t m : std::ranges::iota_view{j+1, tree_array.size()}) {
         trees++;
         if (tree_array[i][m]>=value || m == tree_array.size()-1) {
             dist *= trees;
