@@ -39,7 +39,7 @@ AOC_DAY(Day10_1) {
 void draw_pixel(int cycle, int x) {
     int position = cycle%40-1;
 
-    char output = std::abs(position-x) < 2 ? '#' : '.';
+    char output = std::abs(position-x) < 2 || std::abs(position-x) == 39 ? '#' : '.';
     if (std::abs(position-x)  == 39)
         output='#';
     cout << output;
@@ -47,8 +47,9 @@ void draw_pixel(int cycle, int x) {
         cout << endl;
 }
 
-AOC_DAY(Day10_2){
-
+AOC_DAY(Day10_2) {
+    if (run_mode == RUN_MODE::ALL)
+       cout.setstate(std::ios::failbit);
     int cycle=1, x=1, signal_strength=0;
     std::string line;
     while (getline(cin, line)) {
@@ -66,6 +67,7 @@ AOC_DAY(Day10_2){
             x+=add;
         }
     }
-
+    if (run_mode == RUN_MODE::ALL)
+       cout.clear();
     return "ELPLZGZL";
 }
