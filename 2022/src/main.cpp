@@ -1,7 +1,7 @@
 #include "main.h"
 #include <chrono>
-std::map<std::string, std::function<std::string()>> DayFactory::Days;
-bool DayFactory::Register(std::string name, std::function<std::string()> func) {
+std::map<std::string, std::function<std::string(RUN_MODE)>> DayFactory::Days;
+bool DayFactory::Register(std::string name, std::function<std::string(RUN_MODE)> func) {
     Days[name] = std::move(func);
     return true;
 }
@@ -42,7 +42,7 @@ int main(int argc, char *argv[]) {
             std::ifstream in(input_file);
             std::cin.rdbuf(in.rdbuf()); //redirect std::cin to in.txt!
             auto start = std::chrono::high_resolution_clock::now();
-            std::string output = it->second();
+            std::string output = it->second(RUN_MODE::ALL);
             cout << output << " ";
             auto stop = std::chrono::high_resolution_clock::now();
             auto duration = std::chrono::duration<double, std::milli>(stop - start);
@@ -57,7 +57,7 @@ int main(int argc, char *argv[]) {
     } else {
         cout << "Running: " << name  << endl;
         auto start = std::chrono::high_resolution_clock::now();
-        cout << DayFactory::Days[name]() << endl;
+        cout << DayFactory::Days[name](RUN_MODE::RUN) << endl;
         auto stop = std::chrono::high_resolution_clock::now();
         auto duration = std::chrono::duration<double, std::milli>(stop - start);
         cout << "Time: " << duration.count() << " ms"<<endl;
