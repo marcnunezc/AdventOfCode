@@ -16,5 +16,6 @@ include_directories(Day07)
 include_directories(Day08)
 include_directories(Day09)
 include_directories(Day10)
+include_directories(Day11)
 
 add_executable(aoc22 src/main.cpp)
