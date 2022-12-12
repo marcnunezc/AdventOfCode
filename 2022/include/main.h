@@ -12,6 +12,7 @@
 #include <fstream>
 #include <sstream>
 #include <ranges>
+#include <algorithm>
 
 using namespace std;
 
