@@ -88,14 +88,14 @@ AOC_DAY(Day14_1) {
             else {
 
                 cave_map[{j,i-1}] = cave::SAND;
-                draw_map(cave_map);
+                // draw_map(cave_map);
                 i = 0;
                 j = 500;
             }
         if (i>max_i+1) {
             cave_map[{j,i}] = cave::FLYING;
             is_sand_stopped=false;
-            draw_map(cave_map);
+            // draw_map(cave_map);
         }
     }
 
@@ -130,17 +130,12 @@ AOC_DAY(Day14_2) {
             else {
 
                 cave_map[{j,i-1}] = cave::SAND;
-                draw_map(cave_map);
+                // draw_map(cave_map);
                 if (j == 500 && i-1==0)
                     is_sand_stopped=false;
                 i = 0;
                 j = 500;
             }
-        // if (i=500max_i+1) {
-        //     cave_map[{j,i}] = cave::FLYING;
-        //     is_sand_stopped=false;
-        //     draw_map(cave_map);
-        // }
     }
 
     int count = 0;
