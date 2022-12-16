@@ -12,7 +12,6 @@ std::unordered_map<std::pair<int,int>, cave, pair_hash> read_cave_system() {
     std::unordered_map<std::pair<int,int>, cave, pair_hash> cave_map;
     while(getline(cin, line)) {
         std::vector<std::pair<int,int>> rock_line;
-        cout << line << endl;
         int value;
         size_t pos = 0;
         std::string substr;
