@@ -3,75 +3,80 @@ struct double_linked_list {
     double_linked_list* prev;
     double_linked_list* next;
 };
+
 AOC_DAY(Day20_1) {
     std::vector<int> values;
     std::vector<double_linked_list*> linked_list_vector;
-    int x, x_next;
-    int i=0;
-    cin >> x;
-    double_linked_list* start = new double_linked_list;
-    start->value = x;
+    int x;
     double_linked_list* p_null_value;
-    while(cin >> x_next) {
-        double_linked_list* next = start;
-        next->prev = start;
-        next->value = x_next;
-        start->next = next;
-        if (start->value == 0)
-            p_null_value = start;
-        linked_list_vector.push_back(start);
-        auto prev = start;
-        start = new double_linked_list;
-        start->value = x_next;
-        start->prev = prev;
+    while(cin >> x) {
+        auto node = new double_linked_list;
+        node->value = x;
+        if (x==0)
+            p_null_value = node;
+        linked_list_vector.push_back(node);
     }
-    start->next = linked_list_vector.front();
-    linked_list_vector.push_back(start);
-    linked_list_vector.front()->prev = linked_list_vector.back();
+    for (int i=0; i<linked_list_vector.size(); i++) {
+        if (i==0)
+            linked_list_vector[i]->prev = linked_list_vector.back();
+        else
+            linked_list_vector[i]->prev = linked_list_vector[i-1];
+        if (i==linked_list_vector.size()-1)
+            linked_list_vector[i]->next = linked_list_vector.front();
+        else
+            linked_list_vector[i]->next = linked_list_vector[i+1];
+    }
 
     for (auto p_value : linked_list_vector) {
-        // cout << p_value->value << " next is " << p_value->next->value<<" prev is " << p_value->prev->value<<  endl;
-        int steps = 0;
-        auto printing = p_value;
-        auto* next = p_value;
-        // cout << "hey " << endl;
-        while (steps < linked_list_vector.size()) {
-            cout << printing -> value << " ";
-            next = printing->next;
-            if (next)
-                printing = next;
-            steps++;
-        }
-        cout << endl;
+        int count = 0;
+        if (p_value->value > 0) {
+            //pop p_value
+            auto aux_p_value = p_value;
+            p_value->prev->next = aux_p_value->next;
+            p_value->next->prev = aux_p_value->prev;
+            auto next = p_value->next;
+            while (++count < p_value->value) {
+                next = next->next;
+            }
+            auto next_next = next->next;
+            //insert p_value
+            next->next = aux_p_value;
+            p_value->next = next_next;
+            p_value->prev = next;
+            next_next -> prev = p_value;
 
-        // int count = 0;
-        // if (p_value->value > 0) {
-        //     linked_list next = p_value->next;
-        //     while (count++ < (p_value->value-1)) {
-        //         next = next->next;
-        //     }
-        //     linked_list* aux_p_value = p_value;
-        //     linked_list* aux_next = next->next;
-        //     p_value->prev->next = p_value->next;
-        //     next->next = aux_p_value;
-        //     p_value->next = aux_next->next;
-        //     p_value->prev = next;
-        // } else (p_value->value < 0) {
-        //     linked_list prev = p_value->prev;
-        //     while (count++ < (std::abs(p_value->value)-1)) {
-        //         prev = prev->prev;
-        //     }
-        //     linked_list* aux_p_value = p_value;
-        //     linked_list* aux_prev = prev->prev;
-        //     p_value->next->prev = p_value->prev;
-        //     prev->prev = aux_p_value;
-        //     p_value->prev = aux_prev->prev;
-        //     p_value->next = prev;
-        // }
+        } else if (p_value->value < 0) {
+            auto aux_p_value = p_value;
+            //pop p_value
+            p_value->prev->next = aux_p_value->next;
+            p_value->next->prev = aux_p_value->prev;
+            auto prev = p_value->prev;
+            while (++count < std::abs(p_value->value)) {
+                prev = prev->prev;
+            }
+            auto prev_prev = prev->prev;
+
+            //insert p_value
+            prev->prev = aux_p_value;
+            p_value->prev = prev_prev;
+            p_value->next = prev;
+            prev_prev->next = p_value;
+        }
+    }
+    auto node = p_null_value;
+    int steps = 0;
+    int sum = 0;
+    while (true) {
+
+        if ((steps) % 1000 == 0)
+            sum += node -> value;
+        if (steps == 3000)
+            break;
+        steps++;
+        node = node->next;
     }
 
-    cout << endl;
-    return std::to_string(2);
+    return std::to_string(sum);
 }
 
 AOC_DAY(Day20_2) {
