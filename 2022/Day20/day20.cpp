@@ -35,7 +35,8 @@ AOC_DAY(Day20_1) {
             p_value->prev->next = aux_p_value->next;
             p_value->next->prev = aux_p_value->prev;
             auto next = p_value->next;
-            while (++count < p_value->value) {
+            int limit = p_value -> value < linked_list_vector.size() ? p_value -> value : p_value -> value % linked_list_vector.size() +1;
+            while (++count < limit) {
                 next = next->next;
             }
             auto next_next = next->next;
@@ -51,7 +52,8 @@ AOC_DAY(Day20_1) {
             p_value->prev->next = aux_p_value->next;
             p_value->next->prev = aux_p_value->prev;
             auto prev = p_value->prev;
-            while (++count < std::abs(p_value->value)) {
+            int limit = std::abs(p_value -> value) < linked_list_vector.size() ? std::abs(p_value -> value) : std::abs(p_value -> value) % linked_list_vector.size() +1;
+            while (++count < limit) {
                 prev = prev->prev;
             }
             auto prev_prev = prev->prev;
