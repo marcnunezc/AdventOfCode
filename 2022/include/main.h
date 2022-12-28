@@ -13,6 +13,7 @@
 #include <sstream>
 #include <ranges>
 #include <algorithm>
+#include <cmath>
 
 using namespace std;
 
