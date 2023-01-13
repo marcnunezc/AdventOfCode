@@ -22,6 +22,7 @@
 #include "day22.cpp"
 #include "day23.cpp"
 #include "day24.cpp"
+#include "day25.cpp"
 
 std::map<std::string, std::string> expected_input = {
     {"Day01_1","66186"},
@@ -73,4 +74,6 @@ std::map<std::string, std::string> expected_input = {
     {"Day23_2","976"},
     {"Day24_1","230"},
     {"Day24_2","713"},
+    {"Day25_1","1"},
+    {"Day25_2","2"},
 };
