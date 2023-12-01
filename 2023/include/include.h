@@ -1,8 +1,8 @@
 #include "day01.cpp"
 
 std::map<std::string, std::string> expected_input = {
-    {"Day01_1","N/A"},
-    {"Day01_2","N/A"},
+    {"Day01_1","54708"},
+    {"Day01_2","54087"},
     {"Day02_1","N/A"},
     {"Day02_2","N/A"},
     {"Day03_1","N/A"},
