@@ -14,7 +14,7 @@ AOC_DAY(Day02_1){
         sscanf(game_id_string.c_str(), "Game %d", &id);
         auto sets_string = line.substr(strlen(game_id_string.c_str())+1);
         std::istringstream ss(sets_string);
-        while (getline(ss, sets_string, ';')) {
+        while (getline(ss, sets_string, ';') && to_sum) {
             std::istringstream set_ss(sets_string);
             std::string set;
             while (getline(set_ss, set, ',')) {
@@ -23,8 +23,10 @@ AOC_DAY(Day02_1){
                 int number;
                 box_ss >> number;
                 box_ss >> color;
-                if (number > max_colors[color])
+                if (number > max_colors[color]) {
                     to_sum = false;
+                    break;
+                }
             }
         }
         if (to_sum)
