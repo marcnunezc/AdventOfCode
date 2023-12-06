@@ -42,10 +42,10 @@ AOC_DAY(Day06_2){
     IntType distance = stol(line);
 
     // solve for t: (total_time-t)*t > distance
-    IntType t1 = (total_time-std::sqrt(total_time*total_time-4*distance))/2;
-    IntType t2 = (total_time+std::sqrt(total_time*total_time-4*distance))/2;
+    double t1 = (total_time-std::sqrt(total_time*total_time-4*distance))/2;
+    double t2 = (total_time+std::sqrt(total_time*total_time-4*distance))/2;
 
-    size_t sum = std::floor(t2)-std::ceil(t1);
+    size_t sum = std::floor(t2)-std::ceil(t1)+1;
 
     return std::to_string(sum);
 }
