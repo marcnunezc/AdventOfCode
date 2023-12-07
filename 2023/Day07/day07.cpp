@@ -3,26 +3,31 @@ AOC_DAY(Day07_1){
     size_t sum = 0;
     std::string line;
     std::vector<std::pair<std::string, int>> hand_list;
+
+    std::unordered_map<std::string,std::vector<int>> apperances_map;
+    auto compute_apperances = [] (std::string s) {
+        std::unordered_map<char, int> apperances;
+        for (auto& ch : s) apperances[ch]++;
+
+        std::vector<int> sorted_apperances;
+        for (auto& values : apperances) sorted_apperances.push_back(values.second);
+        sort(sorted_apperances.begin(),sorted_apperances.end(), greater<int>());
+        return sorted_apperances;
+    };
+
     while (getline(cin, line)) {
         std::istringstream ss(line);
         std::string hand;
         int bid;
         ss >> hand >> bid;
         hand_list.push_back({hand,bid});
+        apperances_map[hand] = compute_apperances(hand);
     }
-    auto compute_apperances = [] (std::string s) {
-        std::unordered_map<char, int> apperances;
-        for (auto ch : s) apperances[ch]++;
 
-        std::vector<int> sorted_apperances;
-        for (auto values : apperances) sorted_apperances.push_back(values.second);
-        sort(sorted_apperances.begin(),sorted_apperances.end(), greater<int>());
-        return sorted_apperances;
-    };
     auto sort_hand = [&] (std::pair<std::string, int> a, std::pair<std::string, int> b) {
-        auto apperances_a = compute_apperances(a.first);
-        auto apperances_b = compute_apperances(b.first);
-        for (int i=0; i<3; i++) {
+        auto& apperances_a = apperances_map[a.first];
+        auto& apperances_b = apperances_map[b.first];
+        for (int i=0; i<std::min(apperances_a.size(), apperances_b.size()); i++) {
             if (apperances_a[i] != apperances_b[i])
                 return apperances_a[i] < apperances_b[i];
         }
@@ -47,20 +52,15 @@ AOC_DAY(Day07_2){
     size_t sum = 0;
     std::string line;
     std::vector<std::pair<std::string, int>> hand_list;
-    while (getline(cin, line)) {
-        std::istringstream ss(line);
-        std::string hand;
-        int bid;
-        ss >> hand >> bid;
-        hand_list.push_back({hand,bid});
-    }
+
+    std::unordered_map<std::string,std::vector<int>> apperances_map;
     auto compute_apperances = [] (std::string s) {
         std::unordered_map<char, int> apperances;
-        for (auto ch : s) apperances[ch]++;
+        for (auto& ch : s) apperances[ch]++;
 
 
         std::vector<int> sorted_apperances;
-        for (auto values : apperances) sorted_apperances.push_back(values.second);
+        for (auto& values : apperances) sorted_apperances.push_back(values.second);
         sort(sorted_apperances.begin(),sorted_apperances.end(), greater<int>());
         if (apperances.find('J')!=apperances.end()) {
             if (sorted_apperances[0] == 4) {
@@ -94,9 +94,19 @@ AOC_DAY(Day07_2){
         }
         return sorted_apperances;
     };
+
+    while (getline(cin, line)) {
+        std::istringstream ss(line);
+        std::string hand;
+        int bid;
+        ss >> hand >> bid;
+        hand_list.push_back({hand,bid});
+        apperances_map[hand] = compute_apperances(hand);
+    }
+
     auto sort_hand = [&] (std::pair<std::string, int> a, std::pair<std::string, int> b) {
-        auto apperances_a = compute_apperances(a.first);
-        auto apperances_b = compute_apperances(b.first);
+        auto& apperances_a = apperances_map[a.first];
+        auto& apperances_b = apperances_map[b.first];
         for (int i=0; i<std::min(apperances_a.size(), apperances_b.size()); i++) {
             if (apperances_a[i] != apperances_b[i])
                 return apperances_a[i] < apperances_b[i];
