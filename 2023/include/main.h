@@ -14,6 +14,7 @@
 #include <ranges>
 #include <algorithm>
 #include <cmath>
+#include <bitset>
 
 using namespace std;
 
