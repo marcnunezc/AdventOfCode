@@ -15,6 +15,7 @@
 #include <algorithm>
 #include <cmath>
 #include <bitset>
+#include <regex>
 
 using namespace std;
 
