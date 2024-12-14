@@ -76,16 +76,13 @@ AOC_DAY(Day14_2){
     else {
         max_x = 11; max_y = 7;
     }
-    // Q1 : Q2
-    //.........
-    // Q3 : Q4
 
-    bool simetric = false;
-    // for (int n_seconds = 1; n_seconds<100;n_seconds++) {
-    int n_seconds = 1;
-    while (!simetric) {
+    int n_seconds = 0;
+    bool detected_large_continuous_line = false;
+    while (!detected_large_continuous_line) {
+        n_seconds++;
         std::array<int, 4> quadrants({0,0,0,0});
-        std::map<std::pair<int,int>, int> positions;
+        std::set<std::pair<int,int>> positions;
 
         for (auto rt : robot_list) {
             rt.x += ( n_seconds * rt.vx ) % max_x;
@@ -93,45 +90,28 @@ AOC_DAY(Day14_2){
             rt.x = rt.x >= 0 ? rt.x % max_x : rt.x + max_x;
             rt.y = rt.y >= 0 ? rt.y % max_y : rt.y + max_y;
 
-            if (positions.find({rt.x,rt.y}) == positions.end())
-                positions.insert({{rt.x,rt.y},1});
-                if (rt.y < max_y/2) {
-                    if (rt.x < max_x/2)
-                        quadrants[0]++;
-                    else if (rt.x > max_x/2)
-                        quadrants[1]++;
+            positions.insert({{rt.x,rt.y}});
+        }
+
+        int target = 10; // search for 10 contiguous positions
+        for (auto& [x, y] : positions) {
+
+            bool is_large = true;
+            for (int i = 1; i<target+1; i++) {
+                if (positions.find({x+i, y}) == positions.end()){
+                    is_large = false;
+                    break;
                 }
-                else if (rt.y > max_y/2) {
-                    if (rt.x < max_x/2)
-                        quadrants[2]++;
-                    else if (rt.x > max_x/2)
-                        quadrants[3]++;
-            else {
-                positions[{rt.x,rt.y}]++;
             }
-        }
-        }
-
-        cout << n_seconds << endl;
-        cout <<  endl;
-        for (int j = 0; j<max_y; j++) {
-                for (int i =0; i<max_x; i++) {
-                    if (positions.find({i,j}) == positions.end())
-                        cout << '.';
-                    else
-                        cout << positions[{i,j}];
-                }
-                cout << endl;
-        }
-        cout <<  endl;
-        cout <<  endl;
-        if (quadrants[0] == quadrants[1]  || quadrants[2] == quadrants[3]) {
-
-        break;
+            if (is_large) {
+                detected_large_continuous_line = true;
+                break;
+            }
 
         }
+
     }
 
 
-    return std::to_string(product);
+    return std::to_string(n_seconds);
 }
