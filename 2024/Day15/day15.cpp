@@ -10,6 +10,7 @@ AOC_DAY(Day15_1) {
     std::set<std::pair<int,int>> walls;
     std::set<std::pair<int,int>> balls;
     std::pair<int,int> current;
+    std::size_t sum = 0;
     int i = 0;
     int max_j;
     while(getline(cin, line)) {
@@ -51,10 +52,11 @@ AOC_DAY(Day15_1) {
             }
             cout << endl;
         }
+        cout << endl;
     };
-    print_matrix();
+    // print_matrix();
 
-    cout << instructions <<  endl;
+    // cout << instructions <<  endl;
 
 
     for (auto ins : instructions) {
@@ -82,17 +84,18 @@ AOC_DAY(Day15_1) {
             }
 
             current.first += delta.first;
-            current.first += delta.second;
+            current.second += delta.second;
         }
 
-        print_matrix();
+        // print_matrix();
 
-        break;
-
-
-
+        // break;
     }
-    return std::to_string(0);
+
+    for (auto ball : balls) {
+        sum+= 100*ball.first+ball.second;
+    }
+    return std::to_string(sum);
 }
 
 AOC_DAY(Day15_2){
