@@ -31,16 +31,14 @@ std::vector<std::tuple<std::size_t, std::size_t, DIR>> get_neighbours(std::tuple
     auto new_i = i+move_list[current_dir].first;
     auto new_j = j+move_list[current_dir].second;
     std::tuple<size_t,size_t, DIR> new_neighbour({new_i, new_j, current_dir});
-    // if (visited.find(new_neighbour) == visited.end() && walls.find({new_i,new_j}) == walls.end()) {
-    if (walls.find({new_i,new_j}) == walls.end()) {
+    if (visited.find(new_neighbour) == visited.end() && walls.find({new_i,new_j}) == walls.end()) {
         neighbours.push_back(new_neighbour);
         distance_map[new_neighbour] = current_distance+1;
     }
     for (int k = 1; k<4; k++) {
         DIR new_dir = static_cast<DIR>((current_dir + k) % 4);
         std::tuple<size_t,size_t, DIR> dir_neighbour({i, j, new_dir});
-        // if (visited.find(dir_neighbour) == visited.end() && k!=2) {
-        if (k!=2) {
+        if (visited.find(dir_neighbour) == visited.end() && k!=2) {
             neighbours.push_back(dir_neighbour);
             distance_map[dir_neighbour] = current_distance+1000;
         }
