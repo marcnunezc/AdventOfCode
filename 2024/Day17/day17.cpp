@@ -64,7 +64,7 @@ AOC_DAY(Day17_1) {
     sscanf(line.c_str(), "Register C: %ld", &regC);
     getline(cin, line);
     getline(cin, line);
-    regA=1e15;
+
     std::stringstream ss(line.substr(line.find(":")+2));
     std::vector<int> instructions;
     std:string value;
@@ -90,7 +90,7 @@ AOC_DAY(Day17_1) {
 AOC_DAY(Day17_2){
     std::string line;
     std::size_t sum = 0;
-    std::size_t sA, sB, sC, regA, regB, regC;
+    std::size_t startA, startB, startC, regA, regB, regC;
     getline(cin, line);
     sscanf(line.c_str(), "Register A: %ld", &regA);
     getline(cin, line);
@@ -100,37 +100,44 @@ AOC_DAY(Day17_2){
     getline(cin, line);
     getline(cin, line);
     std::stringstream ss(line.substr(line.find(":")+2));
+    std::string target = ss.str();
     std::vector<int> instructions;
     std:string value;
     while(getline(ss, value, ','))
         instructions.push_back(stoi(value));
+    size_t lower = std::pow(10, instructions.size()-3);
+    size_t upper = std::pow(10, instructions.size()-2);
+    startA = regA;
+    startB = regB;
+    startC = regC;
 
-    sA = 2e14+1.5e13;
-    sB = regB;
-    sC = regC;
+    size_t pointer = target.size()-3;
+    size_t step = lower / 10;
 
     std::string output="";
     while (output != ss.str()) {
-        output.clear();
-        sA+=1e8;
-        // if (sA > 1e14+4e13)
-        if (sA > 2e14+2e13)
-            break;
-        if (sA % 1000 == 0)
-            cout << sA << " ";
-        regA = sA;
-        regB = sB;
-        regC = sC;
-        for (size_t i=0; i<instructions.size(); i++) {
-            auto opcode = (size_t) instructions[i];
-            auto combo = (size_t) instructions[++i];
-            perform_operation(opcode, combo, regA, regB, regC, i, output);
+        startA = lower;
 
+        while(output.size() != target.size() || target.substr(pointer, target.size()) != output.substr(pointer, output.size())) {
+            output.clear();
+            startA+=step;
+            regA = startA;
+            regB = startB;
+            regC = startC;
+            for (size_t i=0; i<instructions.size(); i++) {
+                auto opcode = (size_t) instructions[i];
+                auto combo = (size_t) instructions[++i];
+                perform_operation(opcode, combo, regA, regB, regC, i, output);
+
+            }
+            output = output.substr(0, output.size()-1);
         }
-        output = output.substr(0, output.size()-1);
-        if (sA % 1000 == 0)
-            cout << output << endl;
+        lower = startA-step;
+        step = step/100;
+        if (step <1)
+            step = 1;
+        pointer -= 4;
     }
 
-    return std::to_string(sA);
+    return std::to_string(startA);
 }
