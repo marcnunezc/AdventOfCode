@@ -76,11 +76,7 @@ AOC_DAY(Day17_1) {
     for (size_t i=0; i<instructions.size(); i++) {
         auto opcode = (size_t) instructions[i];
         auto combo = (size_t) instructions[++i];
-            cout << opcode << " " << combo<< endl;
         perform_operation(opcode, combo, regA, regB, regC, i, output);
-        cout << "regA: " << regA << endl;
-        cout << "regB: " << regB << endl;
-        cout << "regC: " << regC << endl;
     }
     output = output.substr(0, output.size()-1);
     return output;
