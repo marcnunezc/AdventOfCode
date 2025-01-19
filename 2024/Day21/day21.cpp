@@ -43,8 +43,6 @@ std::set<std::string> find_shortest_paths(std::string target_sequence, std::pair
         auto start = current;
 
         std::map<std::pair<size_t, size_t>, size_t> distance_map;
-        std::set<std::pair<size_t, size_t>> visited;
-        std::map<std::pair<size_t, size_t>, std::vector<std::pair<size_t, size_t>>> parent_map;
         std::set<std::pair<size_t, size_t>> all_neighbours;
         std::map<std::pair<size_t, size_t>, std::vector<std::string>> paths;
 
@@ -60,14 +58,12 @@ std::set<std::string> find_shortest_paths(std::string target_sequence, std::pair
 
                     if (distance_map.find(neighbour) == distance_map.end() || new_dist < distance_map[neighbour]) {
                         distance_map[neighbour] = new_dist;
-                        parent_map[neighbour] = {current};
                         paths[neighbour].clear();
                         for (auto path : paths[current]) {
                             paths[neighbour].push_back(path + keypad_moves_map[{dx, dy}]);
                         }
                         all_neighbours.insert(neighbour);
                     } else if (new_dist == distance_map[neighbour]) {
-                        parent_map[neighbour].push_back(current);
                         for (auto path : paths[current]) {
                             paths[neighbour].push_back(path + keypad_moves_map[{dx, dy}]);
                         }
@@ -93,27 +89,13 @@ std::set<std::string> find_shortest_paths(std::string target_sequence, std::pair
             min_changes = std::min(min_changes, changes);
         }
 
-        std::vector<std::string> new_min_paths;
-        for (auto path : paths[end]) {
-            auto starting_char = path[0];
-            size_t changes = 0;
-            for (size_t i = 1; i < path.size(); i++) {
-                if (path[i] != path[i-1]) {
-                    changes++;
-                }
-            }
-            if (changes == min_changes) {
-                new_min_paths.push_back(path);
-                // break;
-            }
-        }
         if (all_results.empty()) {
-            for (const auto &path : new_min_paths) {
+            for (const auto &path : paths[end]) {
                 all_results.insert(path + "A");
             }
         } else {
             std::set<std::string> new_results;
-            for (const auto &path : new_min_paths) {
+            for (const auto &path : paths[end]) {
                 for (auto result : all_results) {
                     new_results.insert(result + path + "A");
                 }
@@ -122,45 +104,40 @@ std::set<std::string> find_shortest_paths(std::string target_sequence, std::pair
         }
         current = end;
     }
-    // for (auto result : all_results)
-        // cout << " result is " << result << endl;
     return all_results;
 }
 
-size_t compute_n_changes(std::string path) {
-    size_t changes = 0;
-    for (size_t i = 1; i < path.size(); i++) {
-        if (path[i] != path[i-1]) {
-            changes++;
-        }
-    }
-    return changes;
-}
-void search_shortest_instruction(std::string target_sequence, std::pair<size_t, size_t> current_start, std::map<std::pair<size_t,size_t>, char>& map_to_search, std::map<char, std::pair<size_t,size_t>>& reverse_keypad_map, int level, int target_level, size_t& min_size) {
 
-    // cout << "searching for " << target_sequence << " in level " << level << " nchanges " << compute_n_changes(target_sequence) << endl;
-    auto new_directional_results = find_shortest_paths(target_sequence, current_start, map_to_search, reverse_keypad_map);
-    if (level == target_level) {
-        for (auto new_directional_result : new_directional_results) {
-            cout << " new directional result " << new_directional_result << " size " << new_directional_result.size() << endl;
-            auto final_diretiona_results = find_shortest_paths(new_directional_result, current_start, map_to_search, reverse_keypad_map);
-            for (auto final_diretiona_result : final_diretiona_results) {
-                cout << " final direction result " <<final_diretiona_result << " size " << final_diretiona_result.size()  << endl;
-                min_size = std::min(min_size, final_diretiona_result.size());
-                break;
+size_t compute_size(char current,  std::array<char,26>& start, size_t current_depth, size_t final_depth, std::map<std::pair<char,char>, std::vector<std::string>> directional_translations, std::map<std::tuple<char, char, size_t>, size_t>& cache) {
+    auto cache_tuple = std::make_tuple(current, start[current_depth], current_depth);
+    if (cache.find(cache_tuple) != cache.end())
+        return cache[cache_tuple];
+
+    auto result_list = directional_translations[{current, start[current_depth]}];
+    std::size_t sum = 1e18;
+    if (current_depth == final_depth) {
+        return result_list[0].size();
+    }
+    else {
+        for (auto result : result_list) {
+            std::size_t partial_sum = 0;
+            start[current_depth+1] = result.back();
+            for (auto ch : result) {
+                partial_sum += compute_size(ch,  start, current_depth+1, final_depth, directional_translations, cache);
+                start[current_depth+1] = ch;
             }
-            break;
+            sum = std::min(sum, partial_sum);
         }
-    } else {
-        for (auto new_directional_result : new_directional_results) {
-            cout << " new directional result " << new_directional_result << " size " << new_directional_result.size() << endl;
-            search_shortest_instruction(new_directional_result, current_start, map_to_search, reverse_keypad_map, level+1, target_level, min_size);
-            break;
-        }
+
     }
+
+    cache[cache_tuple] = sum;
+
+    return sum;
 }
 
-AOC_DAY(Day21_1) {
+
+size_t solve_problem(size_t max_level) {
     std::string line;
     std::vector<std::string> codes;
     std::size_t sum = 0;
@@ -183,121 +160,51 @@ AOC_DAY(Day21_1) {
     }
 
     auto current = numerical_start;
+    std::map<std::pair<char,char>, std::vector<std::string>> directional_translations;
+
+
+    // find all shortest pathes for all combination of key, start in the directional keypad.
+    for (auto [key, value] : directional_keypad_reverse) {
+        for (auto [start_key, start_value] : directional_keypad_reverse) {
+            auto result = find_shortest_paths(std::string(1, key), start_value,directional_keypad, directional_keypad_reverse);
+            for (auto res : result) {
+                directional_translations[{key, start_key}].push_back(res);
+            }
+        }
+    }
 
     for (auto number : codes) {
         size_t min_size = 1e16;
         auto numerical_results = find_shortest_paths(number, numerical_start, numerical_keypad, numerical_keypad_reverse);
 
         for (auto numerical_result : numerical_results) {
-            cout << "numerical result " << numerical_result << endl;
-            search_shortest_instruction(numerical_result, directional_start, directional_keypad, directional_keypad_reverse, 1, 2, min_size);
-            break;
+
+            std::array<char,26> start;
+            std::fill(start.begin(), start.end(), 'A');
+
+            size_t size = 0;
+            std::map<std::tuple<char, char, size_t>, size_t> cache;
+            for (auto ch : numerical_result) {
+                size += compute_size(ch, start, 0, max_level, directional_translations,cache);
+                start[0] = ch;
+            }
+
+            min_size = std::min(min_size, size);
         }
         sum += min_size*std::stoi(number.substr(0, number.size()-1));
-        break;
-    }
 
-
-    return std::to_string(sum);
-}
-
-size_t compute_size(char current,  std::array<char,26>& start, size_t current_depth, size_t final_depth, std::map<std::pair<char,char>, std::string> directional_translations, std::map<std::pair<char, size_t>, size_t>& cache) {
-    // if (cache.find({number,current_depth})!=cache.end()) {
-        // count += cache[{number, current_depth}];
-        // return;
-    // }
-    // cout << "current " << current << " start " << start[current_depth] << " current_depth " << current_depth << " final_depth " << final_depth << endl;
-    auto result = directional_translations[{current, start[current_depth]}];
-    // cout << "result " << result << " in depth " << current_depth << endl;
-    std::size_t sum = 0;
-    if (current_depth == final_depth) {
-        cout << result;
-        return result.size();
-    }
-    else {
-        start[current_depth+1] = result.back();
-        for (auto ch : result) {
-            // cout << "evaluating " <<ch <<  " at level " << current_depth +1 << endl;
-            sum += compute_size(ch,  start, current_depth+1, final_depth, directional_translations, cache);
-            start[current_depth+1] = ch;
-        }
-        // cout << "sum " << sum << endl;
-        // cout << "start for level " << current_depth+1 << " is " << start[current_depth+1] << endl;
-        // cout << endl;
     }
 
     return sum;
 }
 
+AOC_DAY(Day21_1) {
+
+    return std::to_string(solve_problem(1));
+}
+
+
 AOC_DAY(Day21_2) {
-    std::string line;
-    std::vector<std::string> codes;
-    std::size_t sum = 0;
-    while (getline(cin,line)) {
-        codes.push_back(line);
-    }
-    std::pair<size_t, size_t> numerical_start = {3,2};
-    std::pair<size_t, size_t> directional_start = {0,2};
 
-    // compute reverse map of numerical_keypad
-    std::map<char, std::pair<size_t,size_t>> numerical_keypad_reverse;
-    for (auto [pos, ch] : numerical_keypad) {
-        numerical_keypad_reverse[ch] = pos;
-    }
-
-    // compute reverse map of directional_keypad
-    std::map<char, std::pair<size_t,size_t>> directional_keypad_reverse;
-    for (auto [pos, ch] : directional_keypad) {
-        directional_keypad_reverse[ch] = pos;
-    }
-
-    auto current = numerical_start;
-    std::map<std::pair<char,char>, std::string> directional_translations;
-
-    for (auto [key, value] : directional_keypad_reverse) {
-        for (auto [start_key, start_value] : directional_keypad_reverse) {
-            auto result = find_shortest_paths(std::string(1, key), start_value,directional_keypad, directional_keypad_reverse);
-            for (auto res : result) {
-                // cout << "path for " << key << " with start " << start_key << " : "<< res << endl;
-                directional_translations[{key, start_key}] = res;
-            }
-        }
-    }
-    for (auto number : codes) {
-        size_t min_size = 1e16;
-        auto numerical_results = find_shortest_paths(number, numerical_start, numerical_keypad, numerical_keypad_reverse);
-
-        for (auto numerical_result : numerical_results) {
-            // cout << "numerical result " << numerical_result << endl;
-            // numerical_result = "<A>Av<<AA>>^AvAA<^AA>A<vAAA>^A";
-            // std::string result;
-            // create start array initialized to 'A'
-            std::array<char,26> start;
-            std::fill(start.begin(), start.end(), 'A');
-            size_t size = 0;
-            std::map<std::pair<char, size_t>, size_t> cache;
-            for (auto ch : numerical_result) {
-                size += compute_size(ch, start, 0, 2, directional_translations,cache);
-                start[0] = ch;
-            }
-            cout << endl;
-            cout << " size " << size << endl;
-            // cout << " new directional result " << result << endl;
-            // std::string final_result;
-            // start = 'A';
-            // for (auto ch : result) {
-            //     final_result += directional_translations[{ch, start}][0];
-            //     start = ch;
-            // }
-            // cout << " final directional result size" << final_result.size() << endl;
-            min_size = std::min(min_size, size);
-            // min_size = final_result.size();
-            break;
-        }
-        sum += min_size*std::stoi(number.substr(0, number.size()-1));
-        break;
-    }
-
-
-    return std::to_string(sum);
+    return std::to_string(solve_problem(24));
 }
