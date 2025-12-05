@@ -1,0 +1,13 @@
+cmake_minimum_required(VERSION 3.16)
+set (CMAKE_CXX_STANDARD 20)
+
+project(aoc25)
+
+set (CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/")
+
+include_directories(include)
+include_directories(Day01)
+include_directories(Day02)
+include_directories(Day03)
+
+add_executable(aoc25 src/main.cpp)
