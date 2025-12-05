@@ -25,7 +25,6 @@ AOC_DAY(Day02_1) {
                 std::string first_half = std::to_string(test_number).substr(0, digits / 2);
                 std::string second_half = std::to_string(test_number).substr(digits / 2);
                 if (first_half == second_half) {
-                    cout << "Found repeating number : " << test_number << endl;
                     sum += test_number;
                 }
             }
